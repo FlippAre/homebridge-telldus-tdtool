@@ -1,6 +1,6 @@
 'use strict'
 
-const TDtool = require('./tdtool')
+const telldus = require('telldus');
 
 // Convert 0-255 to 0-100
 const bitsToPercentage = value => Math.round(value * 100 / 255)
@@ -49,12 +49,33 @@ class TelldusAccessory {
    * @param  {object}             context
    */
   getState(characteristic, callback, context) {
-    if (characteristic.props.format != this.Characteristic.Formats.BOOL)
-      callback('Only bool is supported')
+    this.log("Getting state");
 
-    TDtool.device(this.id).then(device => {
-      callback(null, device.lastsentcommand === 'ON')
-    })
+      telldus.getDevices((err,devices) => {
+        if ( err ) {
+          this.log('Error: ' + err);
+        } else {
+
+          var device = devices.find(d => d.id === this.id)
+          console.log(device);
+          switch(characteristic.props.format) {
+            case this.Characteristic.Formats.BOOL:
+              this.log("bool:" + device.status.name)
+              callback(null, device.status.name !== 'OFF')
+              break
+            case this.Characteristic.Formats.INT:
+              this.log("int:" + device.status.name)
+              if(device.status.name == 'OFF'){
+                callback(null, 0)
+              }else{
+                callback(null, device.status.level)
+              }
+
+              break
+            default:
+              callback('Unsupported Characteristic')
+              break
+          }}})
   }
 
   /**
@@ -68,25 +89,34 @@ class TelldusAccessory {
    *                                             obtained.
    * @param  {object}             context
    */
-  setState(characteristic, value, callback, context) {
-    this.log('Recieved set state request: ' + value)
+   setState(characteristic, value, callback, context) {
+     this.log('Recieved set state request: ' + value)
 
-    switch(characteristic.props.format) {
-      case this.Characteristic.Formats.BOOL:
-        (value ? TDtool.on(this.id) : TDtool.off(this.id)).then(out => {
-          callback(null, out.endswith('Success'))
-        }, error => callback(new Error(error)))
-        break
-      case this.Characteristic.Formats.INT:
-        TDtool.setDimLevel(value).then(() => TDtool.dim(this.id)).then(out => {
-          callback(null, out.endswith('Success'))
-        }, error => callback(new Error(error)))
-        break
-      default:
-        callback('Unsupported Characteristic')
-        break
-    }
-  }
+     switch(characteristic.props.format) {
+       case this.Characteristic.Formats.BOOL:
+         if(value){
+           telldus.turnOn(this.id, (err) => {
+               if (!!err) callback(err, null)
+               callback(null, value)
+           })
+         }else{
+           telldus.turnOff(this.id, (err) => {
+               if (!!err) callback(err, null)
+               callback(null, value)
+           })
+         }
+         break
+       case this.Characteristic.Formats.INT:
+         telldus.dim(this.id, value, (err) => {
+             if (!!err) callback(err, null)
+             callback(null, value)
+         });
+         break
+       default:
+         callback('Unsupported Characteristic')
+         break
+     }
+   }
 
   /**
    * No action done at this moment.

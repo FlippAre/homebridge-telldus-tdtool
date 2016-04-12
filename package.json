@@ -27,7 +27,7 @@
     "url": "https://github.com/amlinger/homebridge-telldus-tdtool.git"
   },
   "dependencies": {
-    "tellstick.conf-parser": "^1.0.1"
+    "telldus": "^1.1.0"
   },
   "engines": {
     "node": ">=0.12.0",
