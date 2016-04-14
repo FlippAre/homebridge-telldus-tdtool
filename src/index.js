@@ -1,7 +1,7 @@
 'use strict'
 
-const TelldusAccessory = require('./lib/telldus-accessory')
-const telldus          = require('telldus');
+const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
+const telldus                    = require('telldus');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -26,12 +26,13 @@ class TelldusTDToolPlatform {
         this.log(
           `Found ${len || 'no'} item${len != 1 ? 's' : ''} of type "device".`
         )
-
         console.log(devices.map(data =>
-          new TelldusAccessory(data, this.log, this.homebridge, this.config)))
+          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
+
+
 
         callback(devices.map(data =>
-          new TelldusAccessory(data, this.log, this.homebridge, this.config)))
+          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
       }
     });
   }
