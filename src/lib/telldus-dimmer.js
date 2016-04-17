@@ -1,6 +1,8 @@
 'use strict'
 
 const telldus = require('telldus');
+const TelldusAccessory = require('./telldus-accessory')
+var TelldusStorage = require('node-persist')
 
 // Convert 0-255 to 0-100
 const bitsToPercentage = value => Math.round(value * 100 / 255)
@@ -11,7 +13,7 @@ const percentageToBits = value => Math.round(value * 255 / 100)
 /**
  * An Accessory convenience wrapper.
  */
-class TelldusDimmer {
+class TelldusDimmer extends TelldusAccessory {
 
   /**
    * Inject everything used by the class. No the neatest solution, but nice for
@@ -26,18 +28,10 @@ class TelldusDimmer {
    *                              instantiation.
    */
   constructor(data, log, homebridge, config) {
-    this.name = data.name
-    this.id = data.id
+    super(data, log, homebridge, config)
+    console.log(homebridge.user.cachedAccessoryPath());
+    TelldusStorage.initSync({ dir: homebridge.user.cachedAccessoryPath() })
 
-    // Split manufacturer and model
-    const modelPair = data.model ? data.model.split(':') : ['N/A', 'N/A']
-    this.model = modelPair[0]
-    this.manufacturer = modelPair[1]
-
-    this.Service = homebridge.hap.Service
-    this.Characteristic = homebridge.hap.Characteristic
-
-    this.service = new this.Service.Lightbulb(this.name)
     this.service
     .getCharacteristic(this.Characteristic.On)
     .on('get', this.getOnState.bind(this))
@@ -48,13 +42,14 @@ class TelldusDimmer {
     .on('get', this.getDimState.bind(this))
     .on('set', this.setDimState.bind(this));
 
-    // Device log
-    this.log = string => log(`[${this.name}]: ${string}`)
-
-    this.prevDimValue = 0 //in bits
+    const storage = TelldusStorage.getItem("TelldusDimmerStorage")
+    if (storage){
+      this.prevDimValue = storage[this.id] || 0
+    }else{
+      this.prevDimValue = 0
+    }
 
   }
-
 
   /**
    * Get the on-state of this Dimmer
@@ -64,12 +59,10 @@ class TelldusDimmer {
    */
   getOnState(callback) {
     this.log("Getting On-state...");
-
-      telldus.getDevices((err,devices) => {
+      this.getState((err, state) => {
         if (!!err) callback(err, null)
-        const device = devices.find(d => d.id === this.id)
-        this.log("State is: " + device.status.name)
-        callback(null, device.status.name !== 'OFF')
+        this.log("State is: " + state.name)
+        callback(null, state.name !== 'OFF')
       })
   }
 
@@ -81,16 +74,15 @@ class TelldusDimmer {
    */
   getDimState(callback) {
     this.log("Getting Dim-state...");
-      telldus.getDevices((err,devices) => {
+      this.getState((err, state) => {
         if (!!err) callback(err, null)
-        const device = devices.find(d => d.id === this.id)
-        if(device.status.name == 'OFF'){
+        if(state.name == 'OFF'){
           this.log("Lightbulb is off and last brightness: " + this.prevDimValue)
           callback(null, this.prevDimValue)
         }else{
           this.log("Lightbulb is on, brightness: "
-           + bitsToPercentage(device.status.level) +"%")
-          callback(null, bitsToPercentage(device.status.level))
+           + bitsToPercentage(state.level) +"%")
+          callback(null, bitsToPercentage(state.level))
         }
       })
   }
@@ -134,6 +126,9 @@ class TelldusDimmer {
        telldus.dim(this.id, percentageToBits(value), (err) => {
            if (!!err) callback(err, null)
            this.prevDimValue = value
+           var storage = {}
+           storage[this.id] = value
+           TelldusStorage.setItem("TelldusDimmerStorage", storage)
            //Let's set On-state to true
            this.service
             .setCharacteristic(this.Characteristic.On, true);
@@ -141,23 +136,6 @@ class TelldusDimmer {
        });
    }
 
-  /**
-   * No action done at this moment.
-   *
-   * @param  {Function} callback Invoked when logging has been done.
-   */
-  identify(callback) {
-    this.log('Identify called.');
-    callback();
-  }
-
-  /**
-   * Return the supported services by this Accessory.
-   * @return {Array} An array of services supported by this accessory.
-   */
-  getServices() {
-    return [this.service]
-  }
 }
 
 module.exports = TelldusDimmer

@@ -1,7 +1,6 @@
 'use strict'
 const TelldusDimmer    = require('./telldus-dimmer')
 const TelldusSwitch   =  require('./telldus-switch')
-const TelldusAccessory = require('./telldus-accessory')
 
 class TelldusAccessoryFactory {
   constructor(data, log, homebridge, config) {
