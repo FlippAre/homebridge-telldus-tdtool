@@ -2,6 +2,7 @@
 
 const telldus = require('telldus');
 const TelldusAccessory = require('./telldus-accessory')
+const path = require('path');
 var TelldusStorage = require('node-persist')
 
 // Convert 0-255 to 0-100
@@ -29,26 +30,25 @@ class TelldusDimmer extends TelldusAccessory {
    */
   constructor(data, log, homebridge, config) {
     super(data, log, homebridge, config)
-    console.log(homebridge.user.cachedAccessoryPath());
-    TelldusStorage.initSync({ dir: homebridge.user.cachedAccessoryPath() })
+    TelldusStorage.initSync({ dir: path.join(homebridge.user.storagePath(), "telldus") })
 
     this.service
     .getCharacteristic(this.Characteristic.On)
     .on('get', this.getOnState.bind(this))
-    .on('set', this.setOnState.bind(this));
+    .on('set', this.setOnState.bind(this))
 
     this.service
     .getCharacteristic(this.Characteristic.Brightness)
     .on('get', this.getDimState.bind(this))
-    .on('set', this.setDimState.bind(this));
+    .on('set', this.setDimState.bind(this))
 
-    const storage = TelldusStorage.getItem("TelldusDimmerStorage")
-    if (storage){
-      this.prevDimValue = storage[this.id] || 0
-    }else{
-      this.prevDimValue = 0
+    // Presist dim value. Can't get the value from Telldus, so let's
+    // cache it. Presists to disk
+    TelldusStorage.getItem(this.name)
+    console.log(this.storage);
+    if (!this.storage){
+      TelldusStorage.setItem(this.name, 0)
     }
-
   }
 
   /**
@@ -77,8 +77,8 @@ class TelldusDimmer extends TelldusAccessory {
       this.getState((err, state) => {
         if (!!err) callback(err, null)
         if(state.name == 'OFF'){
-          this.log("Lightbulb is off and last brightness: " + this.prevDimValue)
-          callback(null, this.prevDimValue)
+          this.log("Lightbulb is off and last brightness: " + TelldusStorage.getItem(this.name))
+          callback(null, TelldusStorage.getItem(this.name))
         }else{
           this.log("Lightbulb is on, brightness: "
            + bitsToPercentage(state.level) +"%")
@@ -100,7 +100,7 @@ class TelldusDimmer extends TelldusAccessory {
      this.log('Recieved set On-state request: ' + value)
          if(value){
            // we would like it to return to old dim value
-           telldus.dim(this.id, percentageToBits(this.prevDimValue), (err) => {
+           telldus.dim(this.id, percentageToBits(TelldusStorage.getItem(this.name)), (err) => {
                if (!!err) callback(err, null)
                callback(null, value)
            });
@@ -125,10 +125,7 @@ class TelldusDimmer extends TelldusAccessory {
      this.log('Recieved set Dim-state request: ' + value)
        telldus.dim(this.id, percentageToBits(value), (err) => {
            if (!!err) callback(err, null)
-           this.prevDimValue = value
-           var storage = {}
-           storage[this.id] = value
-           TelldusStorage.setItem("TelldusDimmerStorage", storage)
+           TelldusStorage.setItemSync(this.name, value)
            //Let's set On-state to true
            this.service
             .setCharacteristic(this.Characteristic.On, true);

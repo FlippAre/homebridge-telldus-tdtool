@@ -38,12 +38,10 @@ class TelldusSwitch extends TelldusAccessory {
    */
   getOnState(callback) {
     this.log("Getting On-state...");
-
-      telldus.getDevices((err,devices) => {
+      this.getState((err,state) => {
         if (!!err) callback(err, null)
-        const device = devices.find(d => d.id === this.id)
-        this.log("State is: " + device.status.name)
-        callback(null, device.status.name !== 'OFF')
+        this.log("State is: " + state.name)
+        callback(null, state.name !== 'OFF')
       })
   }
 
