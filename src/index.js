@@ -1,7 +1,7 @@
 'use strict'
 
-const TelldusAccessory = require('./lib/telldus-accessory')
-const TDtool           = require('./lib/tdtool')
+const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
+const telldus                    = require('telldus');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -9,6 +9,7 @@ const TDtool           = require('./lib/tdtool')
  */
 class TelldusTDToolPlatform {
   constructor(log, config, homebridge) {
+
     this.log = log
     this.config = config
     this.homebridge = homebridge
@@ -16,17 +17,24 @@ class TelldusTDToolPlatform {
 
   accessories(callback) {
     this.log('Loading devices...')
-    TDtool.listDevices().then(devices => {
-      devices = devices.filter(d => d.type === 'device')
+    telldus.getDevices( (err, devices) => {
+      if ( err ) {
+        console.log('Error: ' + err);
+      } else {
+        // The list of devices is returned
+        const len = devices.length
+        this.log(
+          `Found ${len || 'no'} item${len != 1 ? 's' : ''} of type "device".`
+        )
+        console.log(devices.map(data =>
+          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
 
-      const len = devices.length
-      this.log(
-        `Found ${len || 'no'} item${len != 1 ? 's' : ''} of type "device".`
-      )
 
-      callback(devices.map(data =>
-        new TelldusAccessory(data, this.log, this.homebridge, this.config)))
-    }, error => callback(new Error(error)))
+
+        callback(devices.map(data =>
+          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
+      }
+    });
   }
 }
 
