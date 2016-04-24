@@ -29,11 +29,15 @@ class TelldusDoor extends TelldusAccessory {
 
     this.service
     .getCharacteristic(this.Characteristic.CurrentPosition)
-    .on('get', this.getPosistionState.bind(this))
+    .on('get', this.getCurrentPositionState.bind(this))
 
     this.service
     .getCharacteristic(this.Characteristic.CurrentDoorState)
     .on('get', this.getOpenState.bind(this))
+
+    this.service
+    .getCharacteristic(this.Characteristic.PositionState)
+    .on('get', this.getPositionState.bind(this))
 
     this.meta
     .setCharacteristic(this.Characteristic.Model, "Door")
@@ -75,6 +79,14 @@ class TelldusDoor extends TelldusAccessory {
     }
   }
 
+  _translateStateToPosition(state){
+    if (state.name === 'ON'){
+      return this.Characteristic.PositionState.STOPPED
+    }else {
+       return this.Characteristic.PositionState.STOPPED
+    }
+  }
+
   /**
    * Get the on-state of this Dimmer
    *
@@ -97,7 +109,7 @@ class TelldusDoor extends TelldusAccessory {
    * @param  {Function}           callback       To be invoked when result is
    *                                             obtained.
    */
-  getPosistionState(callback) {
+  getCurrentPositionState(callback) {
     this.log("Getting On-state...");
       this.getState((err, state) => {
         if (!!err) callback(err, null)
@@ -106,12 +118,36 @@ class TelldusDoor extends TelldusAccessory {
       })
   }
 
+  /**
+   * Get the on-state of this Dimmer
+   *
+   * @param  {Function}           callback       To be invoked when result is
+   *                                             obtained.
+   */
+  getPositionState(callback) {
+    this.log("Getting On-state...");
+
+      this.getState((err, state) => {
+        if (!!err) callback(err, null)
+        this.log("Door is: " + state.name)
+        callback(null, this._translateStateToPosition(state))
+      })
+  }
+
 
   listenToEvent(id, state){
     if(this.id == id ){
       this.service
       .getCharacteristic(this.Characteristic.CurrentDoorState)
-      .setValue(this._translateStateToDoorStateCharacteristic(state));
+      .setValue(this._translateStateToDoorStateCharacteristic(state))
+
+      this.service
+      .getCharacteristic(this.Characteristic.CurrentPosition)
+      .setValue(this._translateOpenStateToCurrentPosition(state))
+
+      this.service
+      .getCharacteristic(this.Characteristic.PositionState)
+      .setValue(this._translateStateToPosition(state))
     }
   }
 
