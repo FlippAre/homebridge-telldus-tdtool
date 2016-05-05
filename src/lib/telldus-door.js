@@ -44,16 +44,6 @@ class TelldusDoor extends TelldusAccessory {
 
     telldus.addDeviceEventListener(this.listenToEvent.bind(this))
 
-    // this.service
-    // .getCharacteristic(this.Characteristic.PositionState)
-    // .on('get', this.getPositionState.bind(this))
-    // )
-
-    //this.addCharacteristic(Characteristic.CurrentPosition); // 0 eller 100
-    //this.addCharacteristic(Characteristic.PositionState); //Characteristic.PositionState.STOPPED
-    //this.addCharacteristic(Characteristic.TargetPosition);;
-
-
   }
 
   /**
