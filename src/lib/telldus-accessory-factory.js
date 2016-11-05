@@ -1,7 +1,8 @@
 'use strict'
-const TelldusDimmer   = require('./telldus-dimmer')
-const TelldusSwitch   = require('./telldus-switch')
-const TelldusDoor     = require('./telldus-door')
+const TelldusDimmer      = require('./telldus-dimmer')
+const TelldusSwitch      = require('./telldus-switch')
+const TelldusDoor        = require('./telldus-door')
+const TelldusTemperature = require('./telldus-door')
 
 class TelldusAccessoryFactory {
   constructor(data, log, homebridge, config) {
@@ -14,7 +15,6 @@ class TelldusAccessoryFactory {
       this.model = modelPair[0]
     }
 
-
     switch (this.model) {
       case 'selflearning-dimmer':
           return new TelldusDimmer(data, log, homebridge, config)
@@ -26,6 +26,8 @@ class TelldusAccessoryFactory {
       case 'door':
         console.log("door");
         return new TelldusDoor(data, log, homebridge, config)
+      case 'temperaturehumidity':
+        return new TelldusTemperature(data, log, homebridge, config)
       default:
 
     }

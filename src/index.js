@@ -26,13 +26,20 @@ class TelldusTDToolPlatform {
         this.log(
           `Found ${len || 'no'} item${len != 1 ? 's' : ''} of type "device".`
         )
-        console.log(devices.map(data =>
-          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
+        telldus.getSensors((err, sensors) => {
+          if ( err ) {
+            console.log('Error: ' + err);
+          else{
+            const sensorLen = sensors.length
+            this.log(
+              `Found ${sensorLen || 'no'} item${sensorLen != 1 ? 's' : ''} of type "sensors".`
+            )
+            let accessories = devices.concat(sensors)
+            callback(accessories.map(data =>
+              new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
+          }
+        });
 
-
-
-        callback(devices.map(data =>
-          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
       }
     });
   }
