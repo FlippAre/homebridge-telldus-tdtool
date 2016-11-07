@@ -26,6 +26,7 @@ class TelldusAccessoryFactory {
       case 'door':
         return new TelldusDoor(data, log, homebridge, config)
       case 'temperaturehumidity':
+        console.log(temperaturehumidity);
         if(configuredAccessory.id == data.id){
           data.name = configuredAccessory.name
           return new TelldusTemperature(data, log, homebridge, config)

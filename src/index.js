@@ -29,6 +29,7 @@ class TelldusTDToolPlatform {
         telldus.getSensors((err, sensors) => {
           if ( err ) {
             console.log('Error: ' + err);
+          }
           else{
             const sensorLen = sensors.length
             this.log(
@@ -36,8 +37,7 @@ class TelldusTDToolPlatform {
             )
 
             let accessories = devices.concat(
-              sensors
-              .map(
+              sensors.map(
                 s => {
                   s.type = 'SENSOR'
                   return s

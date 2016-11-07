@@ -1,59 +1,52 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
-var telldus = require('telldus');
+const TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
+const telldus = require('telldus');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
  * Tellstick via the CLI tool tdtool.
  */
-
-var TelldusTDToolPlatform = function () {
-  function TelldusTDToolPlatform(log, config, homebridge) {
-    _classCallCheck(this, TelldusTDToolPlatform);
+class TelldusTDToolPlatform {
+  constructor(log, config, homebridge) {
 
     this.log = log;
     this.config = config;
     this.homebridge = homebridge;
   }
 
-  _createClass(TelldusTDToolPlatform, [{
-    key: 'accessories',
-    value: function accessories(callback) {
-      var _this = this;
+  accessories(callback) {
+    this.log('Loading devices...');
+    telldus.getDevices((err, devices) => {
+      if (err) {
+        console.log('Error: ' + err);
+      } else {
+        // The list of devices is returned
+        const len = devices.length;
+        this.log(`Found ${ len || 'no' } item${ len != 1 ? 's' : '' } of type "device".`);
+        telldus.getSensors((err, sensors) => {
+          if (err) {
+            console.log('Error: ' + err);
+          } else {
+            const sensorLen = sensors.length;
+            this.log(`Found ${ sensorLen || 'no' } item${ sensorLen != 1 ? 's' : '' } of type "sensors".`);
 
-      this.log('Loading devices...');
-      telldus.getDevices(function (err, devices) {
-        if (err) {
-          console.log('Error: ' + err);
-        } else {
-          // The list of devices is returned
-          var len = devices.length;
-          _this.log('Found ' + (len || 'no') + ' item' + (len != 1 ? 's' : '') + ' of type "device".');
-          console.log(devices.map(function (data) {
-            return new TelldusAccessoryFactory(data, _this.log, _this.homebridge, _this.config);
-          }));
+            let accessories = devices.concat(sensors.map(s => {
+              s.type = 'SENSOR';
+              return s;
+            }));
 
-          callback(devices.map(function (data) {
-            return new TelldusAccessoryFactory(data, _this.log, _this.homebridge, _this.config);
-          }));
-        }
-      });
-    }
-  }]);
-
-  return TelldusTDToolPlatform;
-}();
+            callback(accessories.map(data => new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)));
+          }
+        });
+      }
+    });
+  }
+}
 
 /*
  * Register the Telldus tdtool platform as this module.
  */
-
-
-module.exports = function (homebridge) {
+module.exports = homebridge => {
   homebridge.registerPlatform('homebridge-telldus-tdtool', "Telldus-TD-Tool", TelldusTDToolPlatform);
 };
