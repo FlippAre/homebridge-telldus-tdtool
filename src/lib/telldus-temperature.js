@@ -26,11 +26,9 @@ class TelldusTemperature extends TelldusAccessory {
     this.service.addCharacteristic(this.Characteristic.CurrentTemperature)
     //this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
 
-
     this.service
     .getCharacteristic(this.Characteristic.getCurrentTemperature)
     .on('get', this.getCurrentTemperature.bind(this))
-
 
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")

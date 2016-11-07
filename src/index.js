@@ -34,7 +34,17 @@ class TelldusTDToolPlatform {
             this.log(
               `Found ${sensorLen || 'no'} item${sensorLen != 1 ? 's' : ''} of type "sensors".`
             )
-            let accessories = devices.concat(sensors)
+
+            let accessories = devices.concat(
+              sensors
+              .map(
+                s => {
+                  s.type = 'SENSOR'
+                  return s
+                }
+              )
+            )
+
             callback(accessories.map(data =>
               new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
           }

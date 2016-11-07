@@ -2,13 +2,13 @@
 const TelldusDimmer      = require('./telldus-dimmer')
 const TelldusSwitch      = require('./telldus-switch')
 const TelldusDoor        = require('./telldus-door')
-const TelldusTemperature = require('./telldus-door')
+const TelldusTemperature = require('./telldus-temperatur')
 
 class TelldusAccessoryFactory {
   constructor(data, log, homebridge, config) {
 
-    const configuredAccessory = config.accessories.find(a => a.name === data.name)
-    if (configuredAccessory){
+    const configuredAccessory = config.accessories.find(a => a.id === data.id && a.type === data.type)
+    if (configuredAccessory.model){
       this.model = configuredAccessory.model
     }else{
       const modelPair = data.model ? data.model.split(':') : ['N/A', 'N/A']
@@ -24,10 +24,12 @@ class TelldusAccessoryFactory {
         return new TelldusSwitch(data, log, homebridge, config)
         break;
       case 'door':
-        console.log("door");
         return new TelldusDoor(data, log, homebridge, config)
       case 'temperaturehumidity':
-        return new TelldusTemperature(data, log, homebridge, config)
+        if(configuredAccessory.id == data.id){
+          data.name = configuredAccessory.name
+          return new TelldusTemperature(data, log, homebridge, config)
+        }
       default:
 
     }
