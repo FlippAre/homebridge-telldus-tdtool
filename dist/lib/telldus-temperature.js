@@ -40,7 +40,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.service.addCharacteristic(_this.Characteristic.CurrentTemperature);
     //this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
 
-    _this.service.getCharacteristic(_this.Characteristic.getCurrentTemperature).on('get', _this.getCurrentTemperature.bind(_this));
+    _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).on('get', _this.getCurrentTemperature.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "TemperatureSensor");
 
