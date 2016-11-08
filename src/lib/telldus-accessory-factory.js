@@ -2,7 +2,7 @@
 const TelldusDimmer      = require('./telldus-dimmer')
 const TelldusSwitch      = require('./telldus-switch')
 const TelldusDoor        = require('./telldus-door')
-const TelldusTemperature = require('./telldus-temperatur')
+const TelldusTemperature = require('./telldus-temperature')
 
 class TelldusAccessoryFactory {
   constructor(data, log, homebridge, config) {
