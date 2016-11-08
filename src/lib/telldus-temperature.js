@@ -34,10 +34,10 @@ class TelldusTemperature extends TelldusAccessory {
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
 
-    var listener = telldus.addSensorEventListener(function(deviceId,protocol,model,type,value,timestamp) {
-      this.service
-      .getCharacteristic(this.Characteristic.CurrentTemperature).setValue(parseFloat(value));
-    });
+    // var listener = telldus.addSensorEventListener(function(deviceId,protocol,model,type,value,timestamp) {
+    //   this.service
+    //   .getCharacteristic(this.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+    // });
 
   }
 
