@@ -34,6 +34,8 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
     var _this = _possibleConstructorReturn(this, (TelldusTemperature.__proto__ || Object.getPrototypeOf(TelldusTemperature)).call(this, data, log, homebridge, config));
 
+    _this.id = "sensor" + data.id;
+
     _this.service = new _this.Service.TemperatureSensor(_this.name);
     _this.service.addCharacteristic(_this.Characteristic.CurrentTemperature);
     //this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)

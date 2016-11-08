@@ -21,6 +21,7 @@ class TelldusTemperature extends TelldusAccessory {
    */
   constructor(data, log, homebridge, config) {
     super(data, log, homebridge, config)
+    this.id = "sensor" + data.id
 
     this.service = new this.Service.TemperatureSensor(this.name)
     this.service.addCharacteristic(this.Characteristic.CurrentTemperature)
