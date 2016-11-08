@@ -30,11 +30,13 @@ var TelldusAccessoryFactory = function TelldusAccessoryFactory(data, log, homebr
       break;
     case 'door':
       return new TelldusDoor(data, log, homebridge, config);
+      break;
     case 'temperaturehumidity':
       if (configuredAccessory) {
         data.name = configuredAccessory.name;
         return new TelldusTemperature(data, log, homebridge, config);
       }
+      break;
     default:
 
   }
