@@ -5,7 +5,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var TelldusDimmer = require('./telldus-dimmer');
 var TelldusSwitch = require('./telldus-switch');
 var TelldusDoor = require('./telldus-door');
-var TelldusTemperature = require('./telldus-temperatur');
+var TelldusTemperature = require('./telldus-temperature');
 
 var TelldusAccessoryFactory = function TelldusAccessoryFactory(data, log, homebridge, config) {
   _classCallCheck(this, TelldusAccessoryFactory);
