@@ -13,7 +13,7 @@ var TelldusAccessoryFactory = function TelldusAccessoryFactory(data, log, homebr
   var configuredAccessory = config.accessories.find(function (a) {
     return a.id === data.id && a.type === data.type;
   });
-  if (configuredAccessory.model) {
+  if (configuredAccessory && configuredAccessory.model) {
     this.model = configuredAccessory.model;
   } else {
     var modelPair = data.model ? data.model.split(':') : ['N/A', 'N/A'];

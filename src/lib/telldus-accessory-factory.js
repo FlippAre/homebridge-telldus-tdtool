@@ -8,7 +8,7 @@ class TelldusAccessoryFactory {
   constructor(data, log, homebridge, config) {
 
     const configuredAccessory = config.accessories.find(a => a.id === data.id && a.type === data.type)
-    if (configuredAccessory.model){
+    if (configuredAccessory && configuredAccessory.model){
       this.model = configuredAccessory.model
     }else{
       const modelPair = data.model ? data.model.split(':') : ['N/A', 'N/A']
