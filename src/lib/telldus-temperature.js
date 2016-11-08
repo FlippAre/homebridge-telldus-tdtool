@@ -24,7 +24,7 @@ class TelldusTemperature extends TelldusAccessory {
     this.id = "sensor" + data.id
 
     this.service = new this.Service.TemperatureSensor(this.name)
-    this.service.addCharacteristic(this.Characteristic.CurrentTemperature)
+    //this.service.addCharacteristic(this.Characteristic.CurrentTemperature)
     //this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
 
     this.service
@@ -34,10 +34,10 @@ class TelldusTemperature extends TelldusAccessory {
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
 
-    // var listener = telldus.addSensorEventListener(function(deviceId,protocol,model,type,value,timestamp) {
-    //   this.service
-    //   .getCharacteristic(this.Characteristic.CurrentTemperature).setValue(parseFloat(value));
-    // });
+    var listener = telldus.addSensorEventListener(function(deviceId,protocol,model,type,value,timestamp) {
+      this.service
+      .getCharacteristic(this.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+    });
 
   }
 

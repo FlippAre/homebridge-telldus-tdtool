@@ -37,17 +37,16 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.id = "sensor" + data.id;
 
     _this.service = new _this.Service.TemperatureSensor(_this.name);
-    _this.service.addCharacteristic(_this.Characteristic.CurrentTemperature);
+    //this.service.addCharacteristic(this.Characteristic.CurrentTemperature)
     //this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
 
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).on('get', _this.getCurrentTemperature.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "TemperatureSensor");
 
-    // var listener = telldus.addSensorEventListener(function(deviceId,protocol,model,type,value,timestamp) {
-    //   this.service
-    //   .getCharacteristic(this.Characteristic.CurrentTemperature).setValue(parseFloat(value));
-    // });
+    var listener = telldus.addSensorEventListener(function (deviceId, protocol, model, type, value, timestamp) {
+      this.service.getCharacteristic(this.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+    });
 
     return _this;
   }
