@@ -27,9 +27,7 @@ class TelldusAccessoryFactory {
         return new TelldusDoor(data, log, homebridge, config)
       case 'temperaturehumidity':
         if(configuredAccessory){
-          console.log(configuredAccessory);
           data.name = configuredAccessory.name
-          console.log(data.name);
           return new TelldusTemperature(data, log, homebridge, config)
         }
       default:
