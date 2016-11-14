@@ -10,7 +10,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
-var RateLimiter = require('limiter').RateLimiter;
 /**
  * An Accessory convenience wrapper.
  */
@@ -35,16 +34,14 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
     var _this = _possibleConstructorReturn(this, (TelldusTemperature.__proto__ || Object.getPrototypeOf(TelldusTemperature)).call(this, data, log, homebridge, config));
 
-    _this.id = "sensor" + data.id;
-    _this.service = new _this.Service.TemperatureSensor(_this.name);
+    _this.id = "humsensor" + data.id;
+    _this.service = new _this.Service.HumiditySensor(_this.name);
 
-    _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).on('get', _this.getCurrentTemperature.bind(_this));
+    _this.service.getCharacteristic(_this.Characteristic.CurrentRelativeHumidity).on('get', _this.getCurrentHumidity.bind(_this));
 
-    _this.meta.setCharacteristic(_this.Characteristic.Model, "TemperatureSensor");
+    _this.meta.setCharacteristic(_this.Characteristic.Model, "HumiditySensor");
 
-    _this.limiter = new RateLimiter(1, 30 * 1000); //limit to once ever 30s
-
-    var listener = telldus.addSensorEventListener(_this.listenToTemperature.bind(_this));
+    var listener = telldus.addSensorEventListener(_this.listenToHumidity.bind(_this));
 
     return _this;
   }
@@ -58,34 +55,30 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
 
   _createClass(TelldusTemperature, [{
-    key: 'getCurrentTemperature',
-    value: function getCurrentTemperature(callback) {
+    key: 'getCurrentHumidity',
+    value: function getCurrentHumidity(callback) {
       var _this2 = this;
 
-      this.log("Getting temperature...");
+      this.log("Getting humidity...");
 
       telldus.getSensors(function (err, sensors) {
         if (!!err) callback(err, null);
-        var temperaturSensor = sensors.find(function (sensor) {
-          return "sensor" + sensor.id === _this2.id;
+        var humiditySensor = sensors.find(function (sensor) {
+          return "humsensor" + sensor.id === _this2.id;
         });
-        var temperature = temperaturSensor.data.find(function (data) {
-          return data.type === "TEMPERATURE";
+        var humidity = humiditySensor.data.find(function (data) {
+          return data.type === "HUMIDITY";
         }).value;
-        _this2.log("Temperatur is: " + temperature);
-        callback(null, parseFloat(temperature));
+        _this2.log("Humidity is: " + humidity);
+        callback(null, parseFloat(humidity));
       });
     }
   }, {
-    key: 'listenToTemperature',
-    value: function listenToTemperature(deviceId, protocol, model, type, value, timestamp) {
-      var _this3 = this;
-
-      if ("sensor" + deviceId == this.id && type == 1) {
-        this.limiter.removeTokens(1, function () {
-          _this3.log('Got temperatur update: ' + value + ' for ' + _this3.name);
-          _this3.service.getCharacteristic(_this3.Characteristic.CurrentTemperature).setValue(parseFloat(value));
-        });
+    key: 'listenToHumidity',
+    value: function listenToHumidity(deviceId, protocol, model, type, value, timestamp) {
+      if ("humsensor" + deviceId == this.id && type == 2) {
+        this.log('Got humidity update: ' + value + ' for ' + this.name);
+        this.service.getCharacteristic(this.Characteristic.CurrentRelativeHumidity).setValue(parseFloat(value));
       }
     }
   }]);

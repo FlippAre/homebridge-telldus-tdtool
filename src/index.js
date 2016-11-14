@@ -13,6 +13,7 @@ class TelldusTDToolPlatform {
     this.log = log
     this.config = config
     this.homebridge = homebridge
+    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge)
   }
 
   accessories(callback) {
@@ -36,7 +37,7 @@ class TelldusTDToolPlatform {
               `Found ${sensorLen || 'no'} item${sensorLen != 1 ? 's' : ''} of type "sensors".`
             )
 
-            let accessories = devices.concat(
+            let rawAccessories = devices.concat(
               sensors.map(
                 s => {
                   s.type = 'SENSOR'
@@ -45,11 +46,14 @@ class TelldusTDToolPlatform {
               )
             )
 
-            callback(accessories.map(data =>
-              new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
+            let telldusAccessories = rawAccessories
+              .map(accessory =>
+                this.telldusAccessoryFactory.build(accessory))
+              .filter(a => a != null)
+
+            callback(telldusAccessories) //flatten)
           }
         });
-
       }
     });
   }

@@ -2,7 +2,6 @@
 
 const telldus = require('telldus');
 const TelldusAccessory = require('./telldus-accessory')
-const RateLimiter = require('limiter').RateLimiter;
 /**
  * An Accessory convenience wrapper.
  */
@@ -22,19 +21,17 @@ class TelldusTemperature extends TelldusAccessory {
    */
   constructor(data, log, homebridge, config) {
     super(data, log, homebridge, config)
-    this.id = "sensor" + data.id
-    this.service = new this.Service.TemperatureSensor(this.name)
+    this.id = "humsensor" + data.id
+    this.service = new this.Service.HumiditySensor(this.name)
 
     this.service
-    .getCharacteristic(this.Characteristic.CurrentTemperature)
-    .on('get', this.getCurrentTemperature.bind(this))
+    .getCharacteristic(this.Characteristic.CurrentRelativeHumidity)
+    .on('get', this.getCurrentHumidity.bind(this))
 
     this.meta
-    .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
+    .setCharacteristic(this.Characteristic.Model, "HumiditySensor")
 
-    this.limiter = new RateLimiter(1, 30*1000) //limit to once ever 30s
-
-    let listener = telldus.addSensorEventListener(this.listenToTemperature.bind(this))
+    let listener = telldus.addSensorEventListener(this.listenToHumidity.bind(this))
 
   }
 
@@ -44,26 +41,23 @@ class TelldusTemperature extends TelldusAccessory {
    * @param  {Function}           callback       To be invoked when result is
    *                                             obtained.
    */
-  getCurrentTemperature(callback) {
-    this.log("Getting temperature...");
+  getCurrentHumidity(callback) {
+    this.log("Getting humidity...");
 
       telldus.getSensors((err, sensors) => {
         if (!!err) callback(err, null)
-        let temperaturSensor = sensors.find((sensor) => "sensor" + sensor.id === this.id)
-        let temperature = temperaturSensor.data.find((data) => data.type === "TEMPERATURE").value
-        this.log("Temperatur is: " + temperature)
-        callback(null, parseFloat(temperature))
+        let humiditySensor = sensors.find((sensor) => "humsensor" + sensor.id === this.id)
+        let humidity = humiditySensor.data.find((data) => data.type === "HUMIDITY").value
+        this.log("Humidity is: " + humidity)
+        callback(null, parseFloat(humidity))
       })
   }
 
-  listenToTemperature(deviceId,protocol,model,type,value,timestamp) {
-    if("sensor" + deviceId == this.id && type == 1){
-      this.limiter.removeTokens(1, () => {
-        this.log(`Got temperatur update: ${value} for ${this.name}`)
-        this.service.getCharacteristic(
-          this.Characteristic.CurrentTemperature).setValue(parseFloat(value)
-        )
-      })
+  listenToHumidity(deviceId,protocol,model,type,value,timestamp) {
+    if("humsensor" + deviceId == this.id && type == 2){
+      this.log(`Got humidity update: ${value} for ${this.name}`)
+      this.service
+      .getCharacteristic(this.Characteristic.CurrentRelativeHumidity).setValue(parseFloat(value));
     }
   }
 

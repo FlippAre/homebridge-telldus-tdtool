@@ -19,6 +19,7 @@ var TelldusTDToolPlatform = function () {
     this.log = log;
     this.config = config;
     this.homebridge = homebridge;
+    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge);
   }
 
   _createClass(TelldusTDToolPlatform, [{
@@ -41,14 +42,18 @@ var TelldusTDToolPlatform = function () {
               var sensorLen = sensors.length;
               _this.log('Found ' + (sensorLen || 'no') + ' item' + (sensorLen != 1 ? 's' : '') + ' of type "sensors".');
 
-              var accessories = devices.concat(sensors.map(function (s) {
+              var rawAccessories = devices.concat(sensors.map(function (s) {
                 s.type = 'SENSOR';
                 return s;
               }));
 
-              callback(accessories.map(function (data) {
-                return new TelldusAccessoryFactory(data, _this.log, _this.homebridge, _this.config);
-              }));
+              var telldusAccessories = rawAccessories.map(function (accessory) {
+                return _this.telldusAccessoryFactory.build(accessory);
+              }).filter(function (a) {
+                return a != null;
+              });
+
+              callback(telldusAccessories); //flatten)
             }
           });
         }
