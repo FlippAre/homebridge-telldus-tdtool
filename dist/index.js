@@ -6,8 +6,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
 var telldus = require('telldus');
-var TelldusDoor = require('./telldus-door');
-var TelldusTemperature = require('./telldus-temperature');
+var TelldusDoor = require('./lib/telldus-door');
+var TelldusTemperature = require('./lib/telldus-temperature');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
