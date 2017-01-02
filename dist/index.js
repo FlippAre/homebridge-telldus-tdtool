@@ -65,7 +65,7 @@ var TelldusTDToolPlatform = function () {
     key: 'addEventListener',
     value: function addEventListener(telldusAccessories) {
       var listener = telldus.addRawDeviceEventListener(function (controllerId, data) {
-        eventData = data.split(";").reduce(function (prev, property) {
+        var eventData = data.split(";").reduce(function (prev, property) {
           prev['' + property.split(":")[0]] = property.split(":")[1];
           return prev;
         }, {});
