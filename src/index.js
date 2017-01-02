@@ -2,8 +2,8 @@
 
 const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
 const telldus                    = require('telldus');
-const TelldusDoor                = require('./telldus-door')
-const TelldusTemperature         = require('./telldus-temperature')
+const TelldusDoor                = require('./lib/telldus-door')
+const TelldusTemperature         = require('./lib/telldus-temperature')
 
 /**
  * Platform wrapper that fetches the accessories connected to the
