@@ -54,7 +54,7 @@ var TelldusTDToolPlatform = function () {
               }).filter(function (a) {
                 return a != null;
               });
-
+              _this.addEventListener(telldusAccessories);
               callback(telldusAccessories); //flatten)
             }
           });

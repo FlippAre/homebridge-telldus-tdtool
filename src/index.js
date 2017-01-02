@@ -52,7 +52,7 @@ class TelldusTDToolPlatform {
               .map(accessory =>
                 this.telldusAccessoryFactory.build(accessory))
               .filter(a => a != null)
-
+            this.addEventListener(telldusAccessories)
             callback(telldusAccessories) //flatten)
           }
         });
