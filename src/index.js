@@ -61,7 +61,7 @@ class TelldusTDToolPlatform {
   }
 
   addEventListener(telldusAccessories){
-    var listener = telldus.addRawDeviceEventListener(function(controllerId, data) {
+    telldus.addRawDeviceEventListener((controllerId, data) => {
       let eventData = data.split(";").reduce((prev, property) => {
         prev[`${property.split(":")[0]}`] = property.split(":")[1]
         return prev
@@ -72,7 +72,7 @@ class TelldusTDToolPlatform {
         eventData.id = `sensor${eventData.id}`
       }
 
-      a = telldusAccessories.find(accessory => accessory.id == eventData.id )
+      let a = telldusAccessories.find(accessory => accessory.id == eventData.id )
       if(a instanceof TelldusDoor){
         a.respondToEvent(eventData.state)
       }else if(a instanceof TelldusTemperature){
