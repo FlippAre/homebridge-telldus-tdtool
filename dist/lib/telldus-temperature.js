@@ -44,8 +44,6 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
     _this.limiter = new RateLimiter(1, 30 * 1000); //limit to once ever 30s
 
-    var listener = telldus.addSensorEventListener(_this.listenToTemperature.bind(_this));
-
     return _this;
   }
 
@@ -77,16 +75,14 @@ var TelldusTemperature = function (_TelldusAccessory) {
       });
     }
   }, {
-    key: 'listenToTemperature',
-    value: function listenToTemperature(deviceId, protocol, model, type, value, timestamp) {
+    key: 'respondToEvent',
+    value: function respondToEvent(value) {
       var _this3 = this;
 
-      if ("sensor" + deviceId == this.id && type == 1) {
-        this.limiter.removeTokens(1, function () {
-          _this3.log('Got temperatur update: ' + value + ' for ' + _this3.name);
-          _this3.service.getCharacteristic(_this3.Characteristic.CurrentTemperature).setValue(parseFloat(value));
-        });
-      }
+      this.limiter.removeTokens(1, function () {
+        _this3.log('Got temperatur update: ' + value + ' for ' + _this3.name);
+        _this3.service.getCharacteristic(_this3.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+      });
     }
   }]);
 

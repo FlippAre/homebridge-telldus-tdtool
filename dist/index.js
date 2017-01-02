@@ -6,6 +6,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
 var telldus = require('telldus');
+var TelldusDoor = require('./telldus-door');
+var TelldusTemperature = require('./telldus-temperature');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -56,6 +58,29 @@ var TelldusTDToolPlatform = function () {
               callback(telldusAccessories); //flatten)
             }
           });
+        }
+      });
+    }
+  }, {
+    key: 'addEventListener',
+    value: function addEventListener(telldusAccessories) {
+      var listener = telldus.addRawDeviceEventListener(function (controllerId, data) {
+        eventData = data.split(";").reduce(function (prev, property) {
+          prev['' + property.split(":")[0]] = property.split(":")[1];
+          return prev;
+        }, {});
+
+        if (eventData.class == "sensor") {
+          eventData.id = 'sensor' + eventData.id;
+        }
+
+        a = telldusAccessories.find(function (accessory) {
+          return accessory.id == eventData.id;
+        });
+        if (a instanceof TelldusDoor) {
+          a.respondToEvent(eventData.state);
+        } else if (a instanceof TelldusTemperature) {
+          a.respondToEvent(eventData.temp);
         }
       });
     }

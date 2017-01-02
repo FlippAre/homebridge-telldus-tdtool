@@ -2,6 +2,8 @@
 
 const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
 const telldus                    = require('telldus');
+const TelldusDoor                = require('./telldus-door')
+const TelldusTemperature         = require('./telldus-temperature')
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -55,6 +57,28 @@ class TelldusTDToolPlatform {
           }
         });
       }
+    });
+  }
+
+  addEventListener(telldusAccessories){
+    var listener = telldus.addRawDeviceEventListener(function(controllerId, data) {
+      eventData = data.split(";").reduce((prev, property) => {
+        prev[`${property.split(":")[0]}`] = property.split(":")[1]
+        return prev
+      }
+      , {})
+  
+      if(eventData.class == "sensor") {
+        eventData.id = `sensor${eventData.id}`
+      }
+
+      a = telldusAccessories.find(accessory => accessory.id == eventData.id )
+      if(a instanceof TelldusDoor){
+        a.respondToEvent(eventData.state)
+      }else if(a instanceof TelldusTemperature){
+        a.respondToEvent(eventData.temp)
+      }
+      
     });
   }
 }

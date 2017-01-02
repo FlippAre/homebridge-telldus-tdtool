@@ -42,8 +42,6 @@ class TelldusDoor extends TelldusAccessory {
     this.meta
     .setCharacteristic(this.Characteristic.Model, "Door")
 
-    telldus.addDeviceEventListener(this.listenToEvent.bind(this))
-
   }
 
   /**
@@ -125,21 +123,20 @@ class TelldusDoor extends TelldusAccessory {
   }
 
 
-  listenToEvent(id, state){
-    if(this.id == id ){
-      this.service
-      .getCharacteristic(this.Characteristic.CurrentDoorState)
-      .setValue(this._translateStateToDoorStateCharacteristic(state))
+  respondToEvent(state){
+    this.service
+    .getCharacteristic(this.Characteristic.CurrentDoorState)
+    .setValue(this._translateStateToDoorStateCharacteristic(state))
 
-      this.service
-      .getCharacteristic(this.Characteristic.CurrentPosition)
-      .setValue(this._translateOpenStateToCurrentPosition(state))
+    this.service
+    .getCharacteristic(this.Characteristic.CurrentPosition)
+    .setValue(this._translateOpenStateToCurrentPosition(state))
 
-      this.service
-      .getCharacteristic(this.Characteristic.PositionState)
-      .setValue(this._translateStateToPosition(state))
-    }
+    this.service
+    .getCharacteristic(this.Characteristic.PositionState)
+    .setValue(this._translateStateToPosition(state))
   }
+  
 
 }
 

@@ -47,8 +47,6 @@ var TelldusDoor = function (_TelldusAccessory) {
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "Door");
 
-    telldus.addDeviceEventListener(_this.listenToEvent.bind(_this));
-
     return _this;
   }
 
@@ -149,15 +147,13 @@ var TelldusDoor = function (_TelldusAccessory) {
       });
     }
   }, {
-    key: 'listenToEvent',
-    value: function listenToEvent(id, state) {
-      if (this.id == id) {
-        this.service.getCharacteristic(this.Characteristic.CurrentDoorState).setValue(this._translateStateToDoorStateCharacteristic(state));
+    key: 'respondToEvent',
+    value: function respondToEvent(state) {
+      this.service.getCharacteristic(this.Characteristic.CurrentDoorState).setValue(this._translateStateToDoorStateCharacteristic(state));
 
-        this.service.getCharacteristic(this.Characteristic.CurrentPosition).setValue(this._translateOpenStateToCurrentPosition(state));
+      this.service.getCharacteristic(this.Characteristic.CurrentPosition).setValue(this._translateOpenStateToCurrentPosition(state));
 
-        this.service.getCharacteristic(this.Characteristic.PositionState).setValue(this._translateStateToPosition(state));
-      }
+      this.service.getCharacteristic(this.Characteristic.PositionState).setValue(this._translateStateToPosition(state));
     }
   }]);
 

@@ -34,8 +34,6 @@ class TelldusTemperature extends TelldusAccessory {
 
     this.limiter = new RateLimiter(1, 30*1000) //limit to once ever 30s
 
-    let listener = telldus.addSensorEventListener(this.listenToTemperature.bind(this))
-
   }
 
   /**
@@ -56,15 +54,13 @@ class TelldusTemperature extends TelldusAccessory {
       })
   }
 
-  listenToTemperature(deviceId,protocol,model,type,value,timestamp) {
-    if("sensor" + deviceId == this.id && type == 1){
-      this.limiter.removeTokens(1, () => {
-        this.log(`Got temperatur update: ${value} for ${this.name}`)
-        this.service.getCharacteristic(
-          this.Characteristic.CurrentTemperature).setValue(parseFloat(value)
-        )
-      })
-    }
+  respondToEvent(value) {
+    this.limiter.removeTokens(1, () => {
+      this.log(`Got temperatur update: ${value} for ${this.name}`)
+      this.service.getCharacteristic(
+        this.Characteristic.CurrentTemperature).setValue(parseFloat(value)
+      )
+    })
   }
 
 }
