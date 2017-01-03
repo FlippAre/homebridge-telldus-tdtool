@@ -1,8 +1,8 @@
 'use strict'
 
-const telldus = require('telldus');
-const TelldusAccessory = require('./telldus-accessory')
-const RateLimiter = require('limiter').RateLimiter;
+const telldus =           require('telldus')
+const TelldusAccessory =  require('./telldus-accessory')
+const RateLimiter =       require('limiter').RateLimiter
 /**
  * An Accessory convenience wrapper.
  */

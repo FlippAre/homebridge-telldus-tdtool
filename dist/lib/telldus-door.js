@@ -10,6 +10,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
+var RateLimiter = require('limiter').RateLimiter;
 /**
  * An Accessory convenience wrapper.
  */
@@ -40,6 +41,8 @@ var TelldusDoor = function (_TelldusAccessory) {
     _this.service.getCharacteristic(_this.Characteristic.ContactSensorState).on('get', _this.getContactSensorState.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "Door");
+
+    _this.limiter = new RateLimiter(1, 3 * 1000); //limit to once ever 3s
 
     return _this;
   }
@@ -72,12 +75,16 @@ var TelldusDoor = function (_TelldusAccessory) {
   }, {
     key: 'respondToEvent',
     value: function respondToEvent(state) {
-      this.log("Got event for door: " + state.name);
-      if (state.name === 'ON') {
-        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
-      } else {
-        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(this.Characteristic.ContactSensorState.CONTACT_DETECTED);
-      }
+      var _this3 = this;
+
+      this.limiter.removeTokens(1, function () {
+        _this3.log("Got event for door: " + state.name);
+        if (state.name === 'ON') {
+          _this3.service.getCharacteristic(_this3.Characteristic.ContactSensorState).setValue(_this3.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+        } else {
+          _this3.service.getCharacteristic(_this3.Characteristic.ContactSensorState).setValue(_this3.Characteristic.ContactSensorState.CONTACT_DETECTED);
+        }
+      });
     }
   }]);
 

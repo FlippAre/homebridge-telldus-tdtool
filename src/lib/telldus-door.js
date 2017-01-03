@@ -1,7 +1,8 @@
 'use strict'
 
-const telldus = require('telldus');
-const TelldusAccessory = require('./telldus-accessory')
+const telldus =           require('telldus')
+const TelldusAccessory =  require('./telldus-accessory')
+const RateLimiter =       require('limiter').RateLimiter
 /**
  * An Accessory convenience wrapper.
  */
@@ -32,6 +33,8 @@ class TelldusDoor extends TelldusAccessory {
     this.meta
     .setCharacteristic(this.Characteristic.Model, "Door")
 
+    this.limiter = new RateLimiter(1, 3*1000) //limit to once ever 3s
+
   }
 
   /**
@@ -55,16 +58,18 @@ class TelldusDoor extends TelldusAccessory {
   }
 
   respondToEvent(state){
-    this.log("Got event for door: " + state.name)
-    if(state.name === 'ON'){
-      this.service
-        .getCharacteristic(this.Characteristic.ContactSensorState)
-        .setValue(this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
-    }else{
-      this.service
-        .getCharacteristic(this.Characteristic.ContactSensorState)
-        .setValue(this.Characteristic.ContactSensorState.CONTACT_DETECTED)
-    }
+    this.limiter.removeTokens(1, () => {
+      this.log("Got event for door: " + state.name)
+      if(state.name === 'ON'){
+        this.service
+          .getCharacteristic(this.Characteristic.ContactSensorState)
+          .setValue(this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+      }else{
+        this.service
+          .getCharacteristic(this.Characteristic.ContactSensorState)
+          .setValue(this.Characteristic.ContactSensorState.CONTACT_DETECTED)
+      }
+    })
   }
   
 
