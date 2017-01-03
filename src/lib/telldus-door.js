@@ -23,21 +23,13 @@ class TelldusDoor extends TelldusAccessory {
     super(data, log, homebridge, config)
 
     this.service = new this.Service.Door(this.name)
-    this.service.addCharacteristic(this.Characteristic.CurrentDoorState)
+    this.service.addCharacteristic(this.Characteristic.ContactSensorState)
     //this.service.removeCharacteristic(this.Characteristic.PositionState)
     //this.service.removeCharacteristic(this.Characteristic.TargetPosition)
 
     this.service
-    .getCharacteristic(this.Characteristic.CurrentPosition)
-    .on('get', this.getCurrentPositionState.bind(this))
-
-    this.service
-    .getCharacteristic(this.Characteristic.CurrentDoorState)
-    .on('get', this.getOpenState.bind(this))
-
-    this.service
-    .getCharacteristic(this.Characteristic.PositionState)
-    .on('get', this.getPositionState.bind(this))
+    .getCharacteristic(this.Characteristic.ContactSensorState)
+    .on('get', this.getContactSensorState.bind(this))
 
     this.meta
     .setCharacteristic(this.Characteristic.Model, "Door")
@@ -76,65 +68,35 @@ class TelldusDoor extends TelldusAccessory {
   }
 
   /**
-   * Get the on-state of this Dimmer
+   * Get the contact sensor-state of this door
    *
    * @param  {Function}           callback       To be invoked when result is
    *                                             obtained.
    */
-  getOpenState(callback) {
-    this.log("Getting On-state...");
+  getContactSensorState(callback) {
+    this.log("Getting Door-state...");
 
       this.getState((err, state) => {
         if (!!err) callback(err, null)
         this.log("Door is: " + state.name)
-        callback(null, this._translateStateToDoorStateCharacteristic(state))
+        if(state.name === 'ON'){
+          callback(null, Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+        }else{
+          callback(null, Characteristic.ContactSensorState.CONTACT_DETECTED)
+        }
       })
   }
-
-  /**
-   * Get the on-state of this Dimmer
-   *
-   * @param  {Function}           callback       To be invoked when result is
-   *                                             obtained.
-   */
-  getCurrentPositionState(callback) {
-    this.log("Getting On-state...");
-      this.getState((err, state) => {
-        if (!!err) callback(err, null)
-        this.log("Door is: " + state.name)
-        callback(null, this._translateOpenStateToCurrentPosition(state))
-      })
-  }
-
-  /**
-   * Get the on-state of this Dimmer
-   *
-   * @param  {Function}           callback       To be invoked when result is
-   *                                             obtained.
-   */
-  getPositionState(callback) {
-    this.log("Getting On-state...");
-
-      this.getState((err, state) => {
-        if (!!err) callback(err, null)
-        this.log("Door is: " + state.name)
-        callback(null, this._translateStateToPosition(state))
-      })
-  }
-
 
   respondToEvent(state){
-    this.service
-    .getCharacteristic(this.Characteristic.CurrentDoorState)
-    .setValue(this._translateStateToDoorStateCharacteristic(state))
-
-    this.service
-    .getCharacteristic(this.Characteristic.CurrentPosition)
-    .setValue(this._translateOpenStateToCurrentPosition(state))
-
-    this.service
-    .getCharacteristic(this.Characteristic.PositionState)
-    .setValue(this._translateStateToPosition(state))
+    if(state.name === 'ON'){
+      this.service
+        .getCharacteristic(this.Characteristic.ContactSensorState)
+        .setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+    }else{
+      this.service
+        .getCharacteristic(this.Characteristic.ContactSensorState)
+        .setValue(Characteristic.ContactSensorState.CONTACT_DETECTED)
+    }
   }
   
 

@@ -35,15 +35,11 @@ var TelldusDoor = function (_TelldusAccessory) {
     var _this = _possibleConstructorReturn(this, (TelldusDoor.__proto__ || Object.getPrototypeOf(TelldusDoor)).call(this, data, log, homebridge, config));
 
     _this.service = new _this.Service.Door(_this.name);
-    _this.service.addCharacteristic(_this.Characteristic.CurrentDoorState);
+    _this.service.addCharacteristic(_this.Characteristic.ContactSensorState);
     //this.service.removeCharacteristic(this.Characteristic.PositionState)
     //this.service.removeCharacteristic(this.Characteristic.TargetPosition)
 
-    _this.service.getCharacteristic(_this.Characteristic.CurrentPosition).on('get', _this.getCurrentPositionState.bind(_this));
-
-    _this.service.getCharacteristic(_this.Characteristic.CurrentDoorState).on('get', _this.getOpenState.bind(_this));
-
-    _this.service.getCharacteristic(_this.Characteristic.PositionState).on('get', _this.getPositionState.bind(_this));
+    _this.service.getCharacteristic(_this.Characteristic.ContactSensorState).on('get', _this.getContactSensorState.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "Door");
 
@@ -86,74 +82,37 @@ var TelldusDoor = function (_TelldusAccessory) {
     }
 
     /**
-     * Get the on-state of this Dimmer
+     * Get the contact sensor-state of this door
      *
      * @param  {Function}           callback       To be invoked when result is
      *                                             obtained.
      */
 
   }, {
-    key: 'getOpenState',
-    value: function getOpenState(callback) {
+    key: 'getContactSensorState',
+    value: function getContactSensorState(callback) {
       var _this2 = this;
 
-      this.log("Getting On-state...");
+      this.log("Getting Door-state...");
 
       this.getState(function (err, state) {
         if (!!err) callback(err, null);
         _this2.log("Door is: " + state.name);
-        callback(null, _this2._translateStateToDoorStateCharacteristic(state));
-      });
-    }
-
-    /**
-     * Get the on-state of this Dimmer
-     *
-     * @param  {Function}           callback       To be invoked when result is
-     *                                             obtained.
-     */
-
-  }, {
-    key: 'getCurrentPositionState',
-    value: function getCurrentPositionState(callback) {
-      var _this3 = this;
-
-      this.log("Getting On-state...");
-      this.getState(function (err, state) {
-        if (!!err) callback(err, null);
-        _this3.log("Door is: " + state.name);
-        callback(null, _this3._translateOpenStateToCurrentPosition(state));
-      });
-    }
-
-    /**
-     * Get the on-state of this Dimmer
-     *
-     * @param  {Function}           callback       To be invoked when result is
-     *                                             obtained.
-     */
-
-  }, {
-    key: 'getPositionState',
-    value: function getPositionState(callback) {
-      var _this4 = this;
-
-      this.log("Getting On-state...");
-
-      this.getState(function (err, state) {
-        if (!!err) callback(err, null);
-        _this4.log("Door is: " + state.name);
-        callback(null, _this4._translateStateToPosition(state));
+        if (state.name === 'ON') {
+          callback(null, Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+        } else {
+          callback(null, Characteristic.ContactSensorState.CONTACT_DETECTED);
+        }
       });
     }
   }, {
     key: 'respondToEvent',
     value: function respondToEvent(state) {
-      this.service.getCharacteristic(this.Characteristic.CurrentDoorState).setValue(this._translateStateToDoorStateCharacteristic(state));
-
-      this.service.getCharacteristic(this.Characteristic.CurrentPosition).setValue(this._translateOpenStateToCurrentPosition(state));
-
-      this.service.getCharacteristic(this.Characteristic.PositionState).setValue(this._translateStateToPosition(state));
+      if (state.name === 'ON') {
+        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+      } else {
+        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_DETECTED);
+      }
     }
   }]);
 
