@@ -23,7 +23,7 @@ class TelldusDoor extends TelldusAccessory {
     super(data, log, homebridge, config)
 
     this.service = new this.Service.ContactSensor(this.name)
-    this.service.addCharacteristic(this.Characteristic.ContactSensorState)
+    //this.service.addCharacteristic(this.Characteristic.ContactSensorState)
 
     this.service
     .getCharacteristic(this.Characteristic.ContactSensorState)

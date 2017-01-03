@@ -35,7 +35,7 @@ var TelldusDoor = function (_TelldusAccessory) {
     var _this = _possibleConstructorReturn(this, (TelldusDoor.__proto__ || Object.getPrototypeOf(TelldusDoor)).call(this, data, log, homebridge, config));
 
     _this.service = new _this.Service.ContactSensor(_this.name);
-    _this.service.addCharacteristic(_this.Characteristic.ContactSensorState);
+    //this.service.addCharacteristic(this.Characteristic.ContactSensorState)
 
     _this.service.getCharacteristic(_this.Characteristic.ContactSensorState).on('get', _this.getContactSensorState.bind(_this));
 
