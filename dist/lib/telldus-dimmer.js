@@ -41,10 +41,11 @@ var TelldusDimmer = function (_TelldusAccessory) {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
+
   function TelldusDimmer(data, log, homebridge, config) {
     _classCallCheck(this, TelldusDimmer);
 
-    var _this = _possibleConstructorReturn(this, (TelldusDimmer.__proto__ || Object.getPrototypeOf(TelldusDimmer)).call(this, data, log, homebridge, config));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TelldusDimmer).call(this, data, log, homebridge, config));
 
     TelldusStorage.initSync({ dir: path.join(homebridge.user.storagePath(), "telldus") });
 

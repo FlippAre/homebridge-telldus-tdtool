@@ -20,6 +20,7 @@ var TelldusAccessory = function () {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
+
   function TelldusAccessory(data, log, homebridge, config) {
     var _this = this;
 

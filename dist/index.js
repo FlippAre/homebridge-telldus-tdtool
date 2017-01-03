@@ -64,7 +64,7 @@ var TelldusTDToolPlatform = function () {
   }, {
     key: 'addEventListener',
     value: function addEventListener(telldusAccessories) {
-      var listener = telldus.addRawDeviceEventListener(function (controllerId, data) {
+      telldus.addRawDeviceEventListener(function (controllerId, data) {
         var eventData = data.split(";").reduce(function (prev, property) {
           prev['' + property.split(":")[0]] = property.split(":")[1];
           return prev;
@@ -74,7 +74,7 @@ var TelldusTDToolPlatform = function () {
           eventData.id = 'sensor' + eventData.id;
         }
 
-        a = telldusAccessories.find(function (accessory) {
+        var a = telldusAccessories.find(function (accessory) {
           return accessory.id == eventData.id;
         });
         if (a instanceof TelldusDoor) {
