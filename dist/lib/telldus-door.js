@@ -34,10 +34,8 @@ var TelldusDoor = function (_TelldusAccessory) {
 
     var _this = _possibleConstructorReturn(this, (TelldusDoor.__proto__ || Object.getPrototypeOf(TelldusDoor)).call(this, data, log, homebridge, config));
 
-    _this.service = new _this.Service.Door(_this.name);
+    _this.service = new _this.Service.ContactSensor(_this.name);
     _this.service.addCharacteristic(_this.Characteristic.ContactSensorState);
-    //this.service.removeCharacteristic(this.Characteristic.PositionState)
-    //this.service.removeCharacteristic(this.Characteristic.TargetPosition)
 
     _this.service.getCharacteristic(_this.Characteristic.ContactSensorState).on('get', _this.getContactSensorState.bind(_this));
 
@@ -47,48 +45,14 @@ var TelldusDoor = function (_TelldusAccessory) {
   }
 
   /**
-   * Translates ON/OFF to open or closed
+   * Get the contact sensor-state of this door
    *
-   * @param  {string}           state           String, ON or OFF
-   *
+   * @param  {Function}           callback       To be invoked when result is
+   *                                             obtained.
    */
 
+
   _createClass(TelldusDoor, [{
-    key: '_translateStateToDoorStateCharacteristic',
-    value: function _translateStateToDoorStateCharacteristic(state) {
-      if (state.name === 'ON') {
-        return this.Characteristic.CurrentDoorState.OPEN;
-      } else {
-        return this.Characteristic.CurrentDoorState.CLOSED;
-      }
-    }
-  }, {
-    key: '_translateOpenStateToCurrentPosition',
-    value: function _translateOpenStateToCurrentPosition(state) {
-      if (state.name === 'ON') {
-        return 100;
-      } else {
-        return 0;
-      }
-    }
-  }, {
-    key: '_translateStateToPosition',
-    value: function _translateStateToPosition(state) {
-      if (state.name === 'ON') {
-        return this.Characteristic.PositionState.STOPPED;
-      } else {
-        return this.Characteristic.PositionState.STOPPED;
-      }
-    }
-
-    /**
-     * Get the contact sensor-state of this door
-     *
-     * @param  {Function}           callback       To be invoked when result is
-     *                                             obtained.
-     */
-
-  }, {
     key: 'getContactSensorState',
     value: function getContactSensorState(callback) {
       var _this2 = this;
@@ -108,6 +72,7 @@ var TelldusDoor = function (_TelldusAccessory) {
   }, {
     key: 'respondToEvent',
     value: function respondToEvent(state) {
+      this.log("Got event for door: " + state.name);
       if (state.name === 'ON') {
         this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
       } else {

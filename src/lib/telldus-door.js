@@ -22,10 +22,8 @@ class TelldusDoor extends TelldusAccessory {
   constructor(data, log, homebridge, config) {
     super(data, log, homebridge, config)
 
-    this.service = new this.Service.Door(this.name)
+    this.service = new this.Service.ContactSensor(this.name)
     this.service.addCharacteristic(this.Characteristic.ContactSensorState)
-    //this.service.removeCharacteristic(this.Characteristic.PositionState)
-    //this.service.removeCharacteristic(this.Characteristic.TargetPosition)
 
     this.service
     .getCharacteristic(this.Characteristic.ContactSensorState)
@@ -34,37 +32,6 @@ class TelldusDoor extends TelldusAccessory {
     this.meta
     .setCharacteristic(this.Characteristic.Model, "Door")
 
-  }
-
-  /**
-   * Translates ON/OFF to open or closed
-   *
-   * @param  {string}           state           String, ON or OFF
-   *
-   */
-
-  _translateStateToDoorStateCharacteristic(state){
-    if(state.name === 'ON'){
-      return this.Characteristic.CurrentDoorState.OPEN
-    }else{
-      return this.Characteristic.CurrentDoorState.CLOSED
-    }
-  }
-
-  _translateOpenStateToCurrentPosition(state){
-    if (state.name === 'ON'){
-      return 100
-    }else {
-       return 0
-    }
-  }
-
-  _translateStateToPosition(state){
-    if (state.name === 'ON'){
-      return this.Characteristic.PositionState.STOPPED
-    }else {
-       return this.Characteristic.PositionState.STOPPED
-    }
   }
 
   /**
@@ -88,6 +55,7 @@ class TelldusDoor extends TelldusAccessory {
   }
 
   respondToEvent(state){
+    this.log("Got event for door: " + state.name)
     if(state.name === 'ON'){
       this.service
         .getCharacteristic(this.Characteristic.ContactSensorState)
