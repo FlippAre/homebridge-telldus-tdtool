@@ -66,7 +66,7 @@ class TelldusTDToolPlatform {
     })
 
     telldus.addSensorEventListener((deviceId,protocol,model,type,value,timestamp) => {
-      let id = `sensor${eventData.id}`
+      let id = `sensor${deviceId}`
       telldusAccessories.find(accessory => accessory.id == id ).respondToEvent(value)
     })
   }
