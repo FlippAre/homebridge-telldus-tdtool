@@ -54,7 +54,7 @@ var TelldusTDToolPlatform = function () {
               }).filter(function (a) {
                 return a != null;
               });
-              _this.addEventListener(telldusAccessories);
+              _this.addEventListeners(telldusAccessories);
               callback(telldusAccessories); //flatten)
             }
           });
@@ -62,26 +62,19 @@ var TelldusTDToolPlatform = function () {
       });
     }
   }, {
-    key: 'addEventListener',
-    value: function addEventListener(telldusAccessories) {
-      telldus.addRawDeviceEventListener(function (controllerId, data) {
-        var eventData = data.split(";").reduce(function (prev, property) {
-          prev['' + property.split(":")[0]] = property.split(":")[1];
-          return prev;
-        }, {});
+    key: 'addEventListeners',
+    value: function addEventListeners(telldusAccessories) {
+      telldus.addEventListener(function (deviceId, status) {
+        telldusAccessories.find(function (accessory) {
+          return accessory.id == deviceId;
+        }).respondToEvent(status);
+      });
 
-        if (eventData.class == "sensor") {
-          eventData.id = 'sensor' + eventData.id;
-        }
-
-        var a = telldusAccessories.find(function (accessory) {
-          return accessory.id == eventData.id;
-        });
-        if (a instanceof TelldusDoor) {
-          a.respondToEvent(eventData.state);
-        } else if (a instanceof TelldusTemperature) {
-          a.respondToEvent(eventData.temp);
-        }
+      telldus.addSensorEventListener(function (deviceId, protocol, model, type, value, timestamp) {
+        var id = 'sensor' + eventData.id;
+        telldusAccessories.find(function (accessory) {
+          return accessory.id == id;
+        }).respondToEvent(value);
       });
     }
   }]);

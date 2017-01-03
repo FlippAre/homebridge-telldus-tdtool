@@ -52,7 +52,7 @@ class TelldusTDToolPlatform {
               .map(accessory =>
                 this.telldusAccessoryFactory.build(accessory))
               .filter(a => a != null)
-            this.addEventListener(telldusAccessories)
+            this.addEventListeners(telldusAccessories)
             callback(telldusAccessories) //flatten)
           }
         });
@@ -60,26 +60,15 @@ class TelldusTDToolPlatform {
     });
   }
 
-  addEventListener(telldusAccessories){
-    telldus.addRawDeviceEventListener((controllerId, data) => {
-      let eventData = data.split(";").reduce((prev, property) => {
-        prev[`${property.split(":")[0]}`] = property.split(":")[1]
-        return prev
-      }
-      , {})
-  
-      if(eventData.class == "sensor") {
-        eventData.id = `sensor${eventData.id}`
-      }
+  addEventListeners(telldusAccessories) {
+    telldus.addEventListener((deviceId, status) => {
+      telldusAccessories.find(accessory => accessory.id == deviceId ).respondToEvent(status)
+    })
 
-      let a = telldusAccessories.find(accessory => accessory.id == eventData.id )
-      if(a instanceof TelldusDoor){
-        a.respondToEvent(eventData.state)
-      }else if(a instanceof TelldusTemperature){
-        a.respondToEvent(eventData.temp)
-      }
-      
-    });
+    telldus.addSensorEventListener((deviceId,protocol,model,type,value,timestamp) => {
+      let id = `sensor${eventData.id}`
+      telldusAccessories.find(accessory => accessory.id == id ).respondToEvent(value)
+    })
   }
 }
 

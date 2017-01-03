@@ -29,11 +29,10 @@ var TelldusDoor = function (_TelldusAccessory) {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
-
   function TelldusDoor(data, log, homebridge, config) {
     _classCallCheck(this, TelldusDoor);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TelldusDoor).call(this, data, log, homebridge, config));
+    var _this = _possibleConstructorReturn(this, (TelldusDoor.__proto__ || Object.getPrototypeOf(TelldusDoor)).call(this, data, log, homebridge, config));
 
     _this.service = new _this.Service.Door(_this.name);
     _this.service.addCharacteristic(_this.Characteristic.CurrentDoorState);

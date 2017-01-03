@@ -29,11 +29,10 @@ var TelldusSwitch = function (_TelldusAccessory) {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
-
   function TelldusSwitch(data, log, homebridge, config) {
     _classCallCheck(this, TelldusSwitch);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TelldusSwitch).call(this, data, log, homebridge, config));
+    var _this = _possibleConstructorReturn(this, (TelldusSwitch.__proto__ || Object.getPrototypeOf(TelldusSwitch)).call(this, data, log, homebridge, config));
 
     _this.service.getCharacteristic(_this.Characteristic.On).on('get', _this.getOnState.bind(_this)).on('set', _this.setOnState.bind(_this));
 

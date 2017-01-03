@@ -29,11 +29,10 @@ var TelldusTemperature = function (_TelldusAccessory) {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
-
   function TelldusTemperature(data, log, homebridge, config) {
     _classCallCheck(this, TelldusTemperature);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TelldusTemperature).call(this, data, log, homebridge, config));
+    var _this = _possibleConstructorReturn(this, (TelldusTemperature.__proto__ || Object.getPrototypeOf(TelldusTemperature)).call(this, data, log, homebridge, config));
 
     _this.id = "humsensor" + data.id;
     _this.service = new _this.Service.HumiditySensor(_this.name);
