@@ -80,9 +80,9 @@ class TelldusDoor extends TelldusAccessory {
         if (!!err) callback(err, null)
         this.log("Door is: " + state.name)
         if(state.name === 'ON'){
-          callback(null, Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+          callback(null, this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
         }else{
-          callback(null, Characteristic.ContactSensorState.CONTACT_DETECTED)
+          callback(null, this.Characteristic.ContactSensorState.CONTACT_DETECTED)
         }
       })
   }
@@ -91,11 +91,11 @@ class TelldusDoor extends TelldusAccessory {
     if(state.name === 'ON'){
       this.service
         .getCharacteristic(this.Characteristic.ContactSensorState)
-        .setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+        .setValue(this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
     }else{
       this.service
         .getCharacteristic(this.Characteristic.ContactSensorState)
-        .setValue(Characteristic.ContactSensorState.CONTACT_DETECTED)
+        .setValue(this.Characteristic.ContactSensorState.CONTACT_DETECTED)
     }
   }
   

@@ -99,9 +99,9 @@ var TelldusDoor = function (_TelldusAccessory) {
         if (!!err) callback(err, null);
         _this2.log("Door is: " + state.name);
         if (state.name === 'ON') {
-          callback(null, Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+          callback(null, _this2.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
         } else {
-          callback(null, Characteristic.ContactSensorState.CONTACT_DETECTED);
+          callback(null, _this2.Characteristic.ContactSensorState.CONTACT_DETECTED);
         }
       });
     }
@@ -109,9 +109,9 @@ var TelldusDoor = function (_TelldusAccessory) {
     key: 'respondToEvent',
     value: function respondToEvent(state) {
       if (state.name === 'ON') {
-        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
       } else {
-        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(Characteristic.ContactSensorState.CONTACT_DETECTED);
+        this.service.getCharacteristic(this.Characteristic.ContactSensorState).setValue(this.Characteristic.ContactSensorState.CONTACT_DETECTED);
       }
     }
   }]);
