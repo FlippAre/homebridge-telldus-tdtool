@@ -64,7 +64,7 @@ var TelldusTDToolPlatform = function () {
   }, {
     key: 'addEventListeners',
     value: function addEventListeners(telldusAccessories) {
-      telldus.addEventListener(function (deviceId, status) {
+      telldus.addDeviceEventListener(function (deviceId, status) {
         telldusAccessories.find(function (accessory) {
           return accessory.id == deviceId;
         }).respondToEvent(status);
