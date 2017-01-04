@@ -6,6 +6,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
 var telldus = require('telldus');
+var TelldusDoor = require('./lib/telldus-door');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -19,6 +20,7 @@ var TelldusTDToolPlatform = function () {
     this.log = log;
     this.config = config;
     this.homebridge = homebridge;
+    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge);
   }
 
   _createClass(TelldusTDToolPlatform, [{
@@ -34,13 +36,49 @@ var TelldusTDToolPlatform = function () {
           // The list of devices is returned
           var len = devices.length;
           _this.log('Found ' + (len || 'no') + ' item' + (len != 1 ? 's' : '') + ' of type "device".');
-          console.log(devices.map(function (data) {
-            return new TelldusAccessoryFactory(data, _this.log, _this.homebridge, _this.config);
-          }));
+          telldus.getSensors(function (err, sensors) {
+            if (err) {
+              console.log('Error: ' + err);
+            } else {
+              var sensorLen = sensors.length;
+              _this.log('Found ' + (sensorLen || 'no') + ' item' + (sensorLen != 1 ? 's' : '') + ' of type "sensors".');
 
-          callback(devices.map(function (data) {
-            return new TelldusAccessoryFactory(data, _this.log, _this.homebridge, _this.config);
-          }));
+              var rawAccessories = devices.concat(sensors.map(function (s) {
+                s.type = 'SENSOR';
+                return s;
+              }));
+
+              var telldusAccessories = rawAccessories.map(function (accessory) {
+                return _this.telldusAccessoryFactory.build(accessory);
+              }).filter(function (a) {
+                return a != null;
+              });
+              _this.addEventListeners(telldusAccessories);
+              callback(telldusAccessories); //flatten)
+            }
+          });
+        }
+      });
+    }
+  }, {
+    key: 'addEventListeners',
+    value: function addEventListeners(telldusAccessories) {
+      telldus.addDeviceEventListener(function (deviceId, status) {
+        var a = telldusAccessories.find(function (accessory) {
+          return accessory.id == deviceId;
+        });
+        if (a && a.respondToEvent) {
+          a.respondToEvent(status);
+        }
+      });
+
+      telldus.addSensorEventListener(function (deviceId, protocol, model, type, value, timestamp) {
+        var id = 'sensor' + deviceId;
+        var a = telldusAccessories.find(function (accessory) {
+          return accessory.id == id;
+        });
+        if (a && a.respondToEvent) {
+          a.respondToEvent(type, value);
         }
       });
     }

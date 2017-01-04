@@ -1,35 +1,51 @@
 'use strict'
-const TelldusDimmer   = require('./telldus-dimmer')
-const TelldusSwitch   = require('./telldus-switch')
-const TelldusDoor     = require('./telldus-door')
+const TelldusDimmer      = require('./telldus-dimmer')
+const TelldusSwitch      = require('./telldus-switch')
+const TelldusDoor        = require('./telldus-door')
+const TelldusTemperature = require('./telldus-temperature')
+const TelldusHumidity    = require('./telldus-humidity')
 
 class TelldusAccessoryFactory {
-  constructor(data, log, homebridge, config) {
+  constructor(log, config, homebridge) {
+    this.log = log
+    this.config = config
+    this.homebridge = homebridge
+  }
 
-    const configuredAccessory = config.accessories.find(a => a.name === data.name)
-    if (configuredAccessory){
+  build(rawAccessory){
+    const configuredAccessory = this.config.accessories.find(a => a.id === rawAccessory.id && a.type === rawAccessory.type)
+    if (configuredAccessory && configuredAccessory.model){
       this.model = configuredAccessory.model
     }else{
-      const modelPair = data.model ? data.model.split(':') : ['N/A', 'N/A']
+      const modelPair = rawAccessory.model ? rawAccessory.model.split(':') : ['N/A', 'N/A']
       this.model = modelPair[0]
     }
 
-
     switch (this.model) {
       case 'selflearning-dimmer':
-          return new TelldusDimmer(data, log, homebridge, config)
+          return new TelldusDimmer(rawAccessory, this.log, this.homebridge, this.config)
         break;
       case 'codeswitch':
       case 'selflearning-switch':
-        return new TelldusSwitch(data, log, homebridge, config)
+        return new TelldusSwitch(rawAccessory, this.log, this.homebridge, this.config)
         break;
       case 'door':
-        console.log("door");
-        return new TelldusDoor(data, log, homebridge, config)
+        return new TelldusDoor(rawAccessory, this.log, this.homebridge, this.config)
+        break;
+      case 'temperaturehumidity':
+        console.log('temperaturehumidity');
+        if(configuredAccessory){
+          rawAccessory.name = configuredAccessory.name
+          let telldusTemperature = new TelldusTemperature(rawAccessory, this.log, this.homebridge, this.config)
+          //let telldusHumidity = new TelldusHumidity(rawAccessory, this.log, this.homebridge, this.config)
+          return telldusTemperature
+        }
+        break;
       default:
-
+        return null
+        break;
     }
-
+    return null
   }
 }
 

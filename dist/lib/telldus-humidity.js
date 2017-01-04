@@ -10,13 +10,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
-var RateLimiter = require('limiter').RateLimiter;
 /**
  * An Accessory convenience wrapper.
  */
 
-var TelldusDoor = function (_TelldusAccessory) {
-  _inherits(TelldusDoor, _TelldusAccessory);
+var TelldusTemperature = function (_TelldusAccessory) {
+  _inherits(TelldusTemperature, _TelldusAccessory);
 
   /**
    * Inject everything used by the class. No the neatest solution, but nice for
@@ -31,65 +30,61 @@ var TelldusDoor = function (_TelldusAccessory) {
    *                              instantiation.
    */
 
-  function TelldusDoor(data, log, homebridge, config) {
-    _classCallCheck(this, TelldusDoor);
+  function TelldusTemperature(data, log, homebridge, config) {
+    _classCallCheck(this, TelldusTemperature);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TelldusDoor).call(this, data, log, homebridge, config));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TelldusTemperature).call(this, data, log, homebridge, config));
 
-    _this.service = new _this.Service.ContactSensor(_this.name);
-    //this.service.addCharacteristic(this.Characteristic.ContactSensorState)
+    _this.id = "humsensor" + data.id;
+    _this.service = new _this.Service.HumiditySensor(_this.name);
 
-    _this.service.getCharacteristic(_this.Characteristic.ContactSensorState).on('get', _this.getContactSensorState.bind(_this));
+    _this.service.getCharacteristic(_this.Characteristic.CurrentRelativeHumidity).on('get', _this.getCurrentHumidity.bind(_this));
 
-    _this.meta.setCharacteristic(_this.Characteristic.Model, "Door");
+    _this.meta.setCharacteristic(_this.Characteristic.Model, "HumiditySensor");
 
-    _this.limiter = new RateLimiter(1, 3 * 1000); //limit to once ever 3s
+    var listener = telldus.addSensorEventListener(_this.listenToHumidity.bind(_this));
 
     return _this;
   }
 
   /**
-   * Get the contact sensor-state of this door
+   * Get the temperatur
    *
    * @param  {Function}           callback       To be invoked when result is
    *                                             obtained.
    */
 
 
-  _createClass(TelldusDoor, [{
-    key: 'getContactSensorState',
-    value: function getContactSensorState(callback) {
+  _createClass(TelldusTemperature, [{
+    key: 'getCurrentHumidity',
+    value: function getCurrentHumidity(callback) {
       var _this2 = this;
 
-      this.log("Getting Door-state...");
+      this.log("Getting humidity...");
 
-      this.getState(function (err, state) {
+      telldus.getSensors(function (err, sensors) {
         if (!!err) callback(err, null);
-        _this2.log("Door is: " + state.name);
-        if (state.name === 'ON') {
-          callback(null, _this2.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
-        } else {
-          callback(null, _this2.Characteristic.ContactSensorState.CONTACT_DETECTED);
-        }
+        var humiditySensor = sensors.find(function (sensor) {
+          return "humsensor" + sensor.id === _this2.id;
+        });
+        var humidity = humiditySensor.data.find(function (data) {
+          return data.type === "HUMIDITY";
+        }).value;
+        _this2.log("Humidity is: " + humidity);
+        callback(null, parseFloat(humidity));
       });
     }
   }, {
-    key: 'respondToEvent',
-    value: function respondToEvent(state) {
-      var _this3 = this;
-
-      this.limiter.removeTokens(1, function () {
-        _this3.log("Got event for door: " + state.name);
-        if (state.name === 'ON') {
-          _this3.service.getCharacteristic(_this3.Characteristic.ContactSensorState).setValue(_this3.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
-        } else {
-          _this3.service.getCharacteristic(_this3.Characteristic.ContactSensorState).setValue(_this3.Characteristic.ContactSensorState.CONTACT_DETECTED);
-        }
-      });
+    key: 'listenToHumidity',
+    value: function listenToHumidity(deviceId, protocol, model, type, value, timestamp) {
+      if ("humsensor" + deviceId == this.id && type == 2) {
+        this.log('Got humidity update: ' + value + ' for ' + this.name);
+        this.service.getCharacteristic(this.Characteristic.CurrentRelativeHumidity).setValue(parseFloat(value));
+      }
     }
   }]);
 
-  return TelldusDoor;
+  return TelldusTemperature;
 }(TelldusAccessory);
 
-module.exports = TelldusDoor;
+module.exports = TelldusTemperature;

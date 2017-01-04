@@ -2,6 +2,7 @@
 
 const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
 const telldus                    = require('telldus');
+const TelldusDoor                = require('./lib/telldus-door')
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -13,6 +14,7 @@ class TelldusTDToolPlatform {
     this.log = log
     this.config = config
     this.homebridge = homebridge
+    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge)
   }
 
   accessories(callback) {
@@ -26,15 +28,52 @@ class TelldusTDToolPlatform {
         this.log(
           `Found ${len || 'no'} item${len != 1 ? 's' : ''} of type "device".`
         )
-        console.log(devices.map(data =>
-          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
+        telldus.getSensors((err, sensors) => {
+          if ( err ) {
+            console.log('Error: ' + err);
+          }
+          else{
+            const sensorLen = sensors.length
+            this.log(
+              `Found ${sensorLen || 'no'} item${sensorLen != 1 ? 's' : ''} of type "sensors".`
+            )
 
+            let rawAccessories = devices.concat(
+              sensors.map(
+                s => {
+                  s.type = 'SENSOR'
+                  return s
+                }
+              )
+            )
 
-
-        callback(devices.map(data =>
-          new TelldusAccessoryFactory(data, this.log, this.homebridge, this.config)))
+            let telldusAccessories = rawAccessories
+              .map(accessory =>
+                this.telldusAccessoryFactory.build(accessory))
+              .filter(a => a != null)
+            this.addEventListeners(telldusAccessories)
+            callback(telldusAccessories) //flatten)
+          }
+        });
       }
     });
+  }
+
+  addEventListeners(telldusAccessories) {
+    telldus.addDeviceEventListener((deviceId, status) => {
+      let a = telldusAccessories.find(accessory => accessory.id == deviceId )
+      if(a && a.respondToEvent){
+        a.respondToEvent(status)
+      }
+    })
+
+    telldus.addSensorEventListener((deviceId,protocol,model,type,value,timestamp) => {
+      let id = `sensor${deviceId}`
+      let a = telldusAccessories.find(accessory => accessory.id == id )
+      if(a && a.respondToEvent){
+        a.respondToEvent(type, value)
+      }
+    })
   }
 }
 
