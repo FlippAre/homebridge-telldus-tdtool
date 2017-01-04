@@ -74,9 +74,12 @@ var TelldusTDToolPlatform = function () {
 
       telldus.addSensorEventListener(function (deviceId, protocol, model, type, value, timestamp) {
         var id = 'sensor' + deviceId;
-        telldusAccessories.find(function (accessory) {
+        var a = telldusAccessories.find(function (accessory) {
           return accessory.id == id;
-        }).respondToEvent(value);
+        });
+        if (a && a.respondToEvent) {
+          a.respondToEvent(value);
+        }
       });
     }
   }]);
