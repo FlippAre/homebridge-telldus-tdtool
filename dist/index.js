@@ -67,7 +67,7 @@ var TelldusTDToolPlatform = function () {
         var a = telldusAccessories.find(function (accessory) {
           return accessory.id == deviceId;
         });
-        if (a.respondToEvent) {
+        if (a && a.respondToEvent) {
           a.respondToEvent(status);
         }
       });

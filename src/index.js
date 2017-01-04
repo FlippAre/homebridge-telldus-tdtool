@@ -62,7 +62,7 @@ class TelldusTDToolPlatform {
   addEventListeners(telldusAccessories) {
     telldus.addDeviceEventListener((deviceId, status) => {
       let a = telldusAccessories.find(accessory => accessory.id == deviceId )
-      if(a.respondToEvent){
+      if(a && a.respondToEvent){
         a.respondToEvent(status)
       }
     })
