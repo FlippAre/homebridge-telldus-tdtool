@@ -7,7 +7,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
 var telldus = require('telldus');
 var TelldusDoor = require('./lib/telldus-door');
-var TelldusTemperature = require('./lib/telldus-temperature');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -65,9 +64,12 @@ var TelldusTDToolPlatform = function () {
     key: 'addEventListeners',
     value: function addEventListeners(telldusAccessories) {
       telldus.addDeviceEventListener(function (deviceId, status) {
-        telldusAccessories.find(function (accessory) {
+        a = telldusAccessories.find(function (accessory) {
           return accessory.id == deviceId;
-        }).respondToEvent(status);
+        });
+        if (a.respondToEvent) {
+          a.respondToEvent(status);
+        }
       });
 
       telldus.addSensorEventListener(function (deviceId, protocol, model, type, value, timestamp) {

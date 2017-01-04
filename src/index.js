@@ -3,7 +3,6 @@
 const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
 const telldus                    = require('telldus');
 const TelldusDoor                = require('./lib/telldus-door')
-const TelldusTemperature         = require('./lib/telldus-temperature')
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -62,7 +61,10 @@ class TelldusTDToolPlatform {
 
   addEventListeners(telldusAccessories) {
     telldus.addDeviceEventListener((deviceId, status) => {
-      telldusAccessories.find(accessory => accessory.id == deviceId ).respondToEvent(status)
+      a = telldusAccessories.find(accessory => accessory.id == deviceId )
+      if(a.respondToEvent){
+        a.respondToEvent(status)
+      }
     })
 
     telldus.addSensorEventListener((deviceId,protocol,model,type,value,timestamp) => {
