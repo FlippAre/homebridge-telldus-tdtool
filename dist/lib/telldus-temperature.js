@@ -39,7 +39,11 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.id = "sensor" + data.id;
     _this.service = new _this.Service.TemperatureSensor(_this.name);
 
+    _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
+
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).on('get', _this.getCurrentTemperature.bind(_this));
+
+    _this.service.getCharacteristic(_this.Characteristic.CurrentRelativeHumidity).on('get', _this.getCurrentHumidity.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "TemperatureSensor");
 
@@ -75,14 +79,46 @@ var TelldusTemperature = function (_TelldusAccessory) {
         callback(null, parseFloat(temperature));
       });
     }
+
+    /**
+    * Get the humidity
+    *
+    * @param  {Function}           callback       To be invoked when result is
+    *                                             obtained.
+    */
+
   }, {
-    key: 'respondToEvent',
-    value: function respondToEvent(value) {
+    key: 'getCurrentHumidity',
+    value: function getCurrentHumidity(callback) {
       var _this3 = this;
 
+      this.log("Getting humidity...");
+
+      telldus.getSensors(function (err, sensors) {
+        if (!!err) callback(err, null);
+        var temperaturSensor = sensors.find(function (sensor) {
+          return "sensor" + sensor.id === _this3.id;
+        });
+        var humidity = temperaturSensor.data.find(function (data) {
+          return data.type === "HUMIDITY";
+        }).value;
+        _this3.log("Humidity is: " + humidity);
+        callback(null, parseFloat(humidity));
+      });
+    }
+  }, {
+    key: 'respondToEvent',
+    value: function respondToEvent(type, value) {
+      var _this4 = this;
+
       this.limiter.removeTokens(1, function () {
-        _this3.log('Got temperatur update: ' + value + ' for ' + _this3.name);
-        _this3.service.getCharacteristic(_this3.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+        if (type == 1) {
+          _this4.log('Got temperatur update: ' + value + ' for ' + _this4.name);
+          _this4.service.getCharacteristic(_this4.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+        } else {
+          _this4.log('Got humidity update: ' + value + ' for ' + _this4.name);
+          _this4.service.getCharacteristic(_this4.Characteristic.CurrentRelativeHumidity).setValue(parseFloat(value));
+        }
       });
     }
   }]);

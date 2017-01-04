@@ -71,7 +71,7 @@ class TelldusTDToolPlatform {
       let id = `sensor${deviceId}`
       let a = telldusAccessories.find(accessory => accessory.id == id )
       if(a && a.respondToEvent){
-        a.respondToEvent(value)
+        a.respondToEvent(type, value)
       }
     })
   }

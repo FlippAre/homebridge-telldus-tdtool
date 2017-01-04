@@ -78,7 +78,7 @@ var TelldusTDToolPlatform = function () {
           return accessory.id == id;
         });
         if (a && a.respondToEvent) {
-          a.respondToEvent(value);
+          a.respondToEvent(type, value);
         }
       });
     }
