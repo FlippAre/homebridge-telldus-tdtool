@@ -27,6 +27,11 @@ class TelldusTemperature extends TelldusAccessory {
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
 
+    // Should work with negative values
+    this.service
+    .getCharacteristic(this.Characteristic.CurrentTemperature)
+    .props.minValue = -50;
+
     this.service
     .getCharacteristic(this.Characteristic.CurrentTemperature)
     .on('get', this.getCurrentTemperature.bind(this))
