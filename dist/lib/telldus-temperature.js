@@ -30,16 +30,18 @@ var TelldusTemperature = function (_TelldusAccessory) {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
-
   function TelldusTemperature(data, log, homebridge, config) {
     _classCallCheck(this, TelldusTemperature);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TelldusTemperature).call(this, data, log, homebridge, config));
+    var _this = _possibleConstructorReturn(this, (TelldusTemperature.__proto__ || Object.getPrototypeOf(TelldusTemperature)).call(this, data, log, homebridge, config));
 
     _this.id = "sensor" + data.id;
     _this.service = new _this.Service.TemperatureSensor(_this.name);
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
+
+    // Should work with negative values
+    _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).props.minValue = -50;
 
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).on('get', _this.getCurrentTemperature.bind(_this));
 
