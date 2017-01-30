@@ -7,6 +7,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
 var telldus = require('telldus');
 var TelldusDoor = require('./lib/telldus-door');
+var sqlite3 = require('sqlite3');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -20,7 +21,12 @@ var TelldusTDToolPlatform = function () {
     this.log = log;
     this.config = config;
     this.homebridge = homebridge;
-    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge);
+    var db = new sqlite3.Database(path.join("./", "presist", "telldus.db"));
+    db.serialize(function () {
+      db.run("CREATE TABLE IF NOT EXISTS dimmer (dimmer_id INTEGER, value INTEGER, UNIQUE(dimmer_id))");
+      db.run("CREATE TABLE IF NOT EXISTS temperature (sensor_id TEXT, datetime DATETIME, value REAL)");
+    });
+    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge, db);
   }
 
   _createClass(TelldusTDToolPlatform, [{

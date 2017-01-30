@@ -11,7 +11,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
 var path = require('path');
-var TelldusStorage = require('node-persist');
+//var TelldusStorage = require('node-persist')
 
 // Convert 0-255 to 0-100
 var bitsToPercentage = function bitsToPercentage(value) {
@@ -41,12 +41,14 @@ var TelldusDimmer = function (_TelldusAccessory) {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
-  function TelldusDimmer(data, log, homebridge, config) {
+  function TelldusDimmer(data, log, homebridge, config, db) {
     _classCallCheck(this, TelldusDimmer);
 
     var _this = _possibleConstructorReturn(this, (TelldusDimmer.__proto__ || Object.getPrototypeOf(TelldusDimmer)).call(this, data, log, homebridge, config));
 
-    TelldusStorage.initSync({ dir: path.join(homebridge.user.storagePath(), "telldus") });
+    _this.db = db;
+    _this.db.run('INSERT OR IGNORE INTO dimmer(dimmer_id, value) VALUES(' + _this.id + ', 0)');
+    //TelldusStorage.initSync({ dir: path.join(homebridge.user.storagePath(), "telldus") })
 
     _this.service.getCharacteristic(_this.Characteristic.On).on('get', _this.getOnState.bind(_this)).on('set', _this.setOnState.bind(_this));
 
@@ -99,8 +101,10 @@ var TelldusDimmer = function (_TelldusAccessory) {
       this.getState(function (err, state) {
         if (!!err) callback(err, null);
         if (state.name == 'OFF') {
-          _this3.log("Lightbulb is off and last brightness: " + TelldusStorage.getItem(_this3.name));
-          callback(null, TelldusStorage.getItem(_this3.name));
+          _this3._getDimValue(function (value) {
+            _this3.log("Lightbulb is off and last brightness: " + value);
+            callback(null, value);
+          });
         } else {
           _this3.log("Lightbulb is on, brightness: " + bitsToPercentage(state.level) + "%");
           callback(null, bitsToPercentage(state.level));
@@ -121,12 +125,16 @@ var TelldusDimmer = function (_TelldusAccessory) {
   }, {
     key: 'setOnState',
     value: function setOnState(value, callback) {
+      var _this4 = this;
+
       this.log('Recieved set On-state request: ' + value);
       if (value) {
         // we would like it to return to old dim value
-        telldus.dim(this.id, percentageToBits(TelldusStorage.getItem(this.name)), function (err) {
-          if (!!err) callback(err, null);
-          callback(null, value);
+        this._getDimValue(function (value) {
+          telldus.dim(_this4.id, percentageToBits(value), function (err) {
+            if (!!err) callback(err, null);
+            callback(null, value);
+          });
         });
       } else {
         telldus.turnOff(this.id, function (err) {
@@ -149,16 +157,28 @@ var TelldusDimmer = function (_TelldusAccessory) {
   }, {
     key: 'setDimState',
     value: function setDimState(value, callback) {
-      var _this4 = this;
+      var _this5 = this;
 
       this.log('Recieved set Dim-state request: ' + value);
       telldus.dim(this.id, percentageToBits(value), function (err) {
         if (!!err) callback(err, null);
-        TelldusStorage.setItemSync(_this4.name, value);
+        _this5._setDimValue(value);
         //Let's set On-state to true
-        _this4.service.setCharacteristic(_this4.Characteristic.On, true);
+        _this5.service.setCharacteristic(_this5.Characteristic.On, true);
         callback(null, value);
       });
+    }
+  }, {
+    key: '_getDimValue',
+    value: function _getDimValue(callback) {
+      this.db.each('SELECT value FROM dimmer WHERE dimmer_id = ' + this.id, function (row, err) {
+        callback(row);
+      });
+    }
+  }, {
+    key: '_setDimValue',
+    value: function _setDimValue(value) {
+      this.db.run('UPDATE dimmer set value = ' + value + ' WHERE dimmer_id = ' + this.id);
     }
   }]);
 

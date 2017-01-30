@@ -3,6 +3,7 @@
 const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
 const telldus                    = require('telldus');
 const TelldusDoor                = require('./lib/telldus-door')
+const sqlite3                    = require('sqlite3')
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -14,7 +15,12 @@ class TelldusTDToolPlatform {
     this.log = log
     this.config = config
     this.homebridge = homebridge
-    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge)
+    let db = new sqlite3.Database(path.join("./", "presist", "telldus.db"));
+    db.serialize(function() {
+      db.run("CREATE TABLE IF NOT EXISTS dimmer (dimmer_id INTEGER, value INTEGER, UNIQUE(dimmer_id))")
+      db.run("CREATE TABLE IF NOT EXISTS temperature (sensor_id TEXT, datetime DATETIME, value REAL)")
+    });
+    this.telldusAccessoryFactory = new TelldusAccessoryFactory(log, config, homebridge, db)
   }
 
   accessories(callback) {

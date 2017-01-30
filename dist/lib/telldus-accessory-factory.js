@@ -11,12 +11,13 @@ var TelldusTemperature = require('./telldus-temperature');
 var TelldusHumidity = require('./telldus-humidity');
 
 var TelldusAccessoryFactory = function () {
-  function TelldusAccessoryFactory(log, config, homebridge) {
+  function TelldusAccessoryFactory(log, config, homebridge, db) {
     _classCallCheck(this, TelldusAccessoryFactory);
 
     this.log = log;
     this.config = config;
     this.homebridge = homebridge;
+    this.db = db;
   }
 
   _createClass(TelldusAccessoryFactory, [{
@@ -34,7 +35,7 @@ var TelldusAccessoryFactory = function () {
 
       switch (this.model) {
         case 'selflearning-dimmer':
-          return new TelldusDimmer(rawAccessory, this.log, this.homebridge, this.config);
+          return new TelldusDimmer(rawAccessory, this.log, this.homebridge, this.config, this.db);
           break;
         case 'codeswitch':
         case 'selflearning-switch':
@@ -47,7 +48,7 @@ var TelldusAccessoryFactory = function () {
           console.log('temperaturehumidity');
           if (configuredAccessory) {
             rawAccessory.name = configuredAccessory.name;
-            var telldusTemperature = new TelldusTemperature(rawAccessory, this.log, this.homebridge, this.config);
+            var telldusTemperature = new TelldusTemperature(rawAccessory, this.log, this.homebridge, this.config, this.db);
             //let telldusHumidity = new TelldusHumidity(rawAccessory, this.log, this.homebridge, this.config)
             return telldusTemperature;
           }
