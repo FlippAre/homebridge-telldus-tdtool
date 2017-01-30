@@ -46,11 +46,6 @@ class TelldusDimmer extends TelldusAccessory {
 
     // Presist dim value. Can't get the value from Telldus, so let's
     // cache it. Presists to disk
-    TelldusStorage.getItem(this.name)
-    console.log(this.storage);
-    if (!this.storage){
-      TelldusStorage.setItem(this.name, 0)
-    }
   }
 
   /**

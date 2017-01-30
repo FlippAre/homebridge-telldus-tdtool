@@ -56,11 +56,6 @@ var TelldusDimmer = function (_TelldusAccessory) {
 
     // Presist dim value. Can't get the value from Telldus, so let's
     // cache it. Presists to disk
-    TelldusStorage.getItem(_this.name);
-    console.log(_this.storage);
-    if (!_this.storage) {
-      TelldusStorage.setItem(_this.name, 0);
-    }
     return _this;
   }
 
