@@ -4,6 +4,7 @@ const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
 const telldus                    = require('telldus');
 const TelldusDoor                = require('./lib/telldus-door')
 const sqlite3                    = require('sqlite3')
+const path                       = require('path')
 
 /**
  * Platform wrapper that fetches the accessories connected to the

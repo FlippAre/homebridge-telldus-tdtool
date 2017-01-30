@@ -8,6 +8,7 @@ var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
 var telldus = require('telldus');
 var TelldusDoor = require('./lib/telldus-door');
 var sqlite3 = require('sqlite3');
+var path = require('path');
 
 /**
  * Platform wrapper that fetches the accessories connected to the
