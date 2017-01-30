@@ -30,13 +30,14 @@ var TelldusTemperature = function (_TelldusAccessory) {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
-  function TelldusTemperature(data, log, homebridge, config) {
+  function TelldusTemperature(data, log, homebridge, config, db) {
     _classCallCheck(this, TelldusTemperature);
 
     var _this = _possibleConstructorReturn(this, (TelldusTemperature.__proto__ || Object.getPrototypeOf(TelldusTemperature)).call(this, data, log, homebridge, config));
 
     _this.id = "sensor" + data.id;
     _this.service = new _this.Service.TemperatureSensor(_this.name);
+    _this.db = db;
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
 
@@ -117,6 +118,8 @@ var TelldusTemperature = function (_TelldusAccessory) {
         if (type == 1) {
           _this4.log('Got temperatur update: ' + value + ' for ' + _this4.name);
           _this4.service.getCharacteristic(_this4.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+          var datetime = new Date().toISOString();
+          _this4.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                     VALUES(' + _this4.id + ', temperatur, ' + datetime + ', ' + value + ')');
         } else {
           _this4.log('Got humidity update: ' + value + ' for ' + _this4.name);
           _this4.service.getCharacteristic(_this4.Characteristic.CurrentRelativeHumidity).setValue(parseFloat(value));

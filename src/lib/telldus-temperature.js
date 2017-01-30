@@ -20,10 +20,12 @@ class TelldusTemperature extends TelldusAccessory {
    * @param  {object}  config     Configuration object passed on from initial
    *                              instantiation.
    */
-  constructor(data, log, homebridge, config) {
+  constructor(data, log, homebridge, config, db) {
     super(data, log, homebridge, config)
     this.id = "sensor" + data.id
     this.service = new this.Service.TemperatureSensor(this.name)
+    this.db = db
+    
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
 
@@ -90,6 +92,9 @@ class TelldusTemperature extends TelldusAccessory {
         this.service.getCharacteristic(this.Characteristic.CurrentTemperature)
           .setValue(parseFloat(value)
         )
+        let datetime = new Date().toISOString()
+        this.db.run(`INSERT INTO sensor(sensor_id, type , datetime, value)
+                     VALUES(${this.id}, temperatur, ${datetime}, ${value})`);
       }else{
         this.log(`Got humidity update: ${value} for ${this.name}`)
         this.service.getCharacteristic(this.Characteristic.CurrentRelativeHumidity)

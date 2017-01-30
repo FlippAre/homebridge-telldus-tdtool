@@ -96,7 +96,7 @@ var TelldusDimmer = function (_TelldusAccessory) {
       this.getState(function (err, state) {
         if (!!err) callback(err, null);
         if (state.name == 'OFF') {
-          _this3._getDimValue(function (value) {
+          _this3._getPersistedDimValue(function (value) {
             _this3.log("Lightbulb is off and last brightness: " + value);
             callback(null, value);
           });
@@ -125,7 +125,7 @@ var TelldusDimmer = function (_TelldusAccessory) {
       this.log('Recieved set On-state request: ' + value);
       if (value) {
         // we would like it to return to old dim value
-        this._getDimValue(function (value) {
+        this._getPersistedDimValue(function (value) {
           telldus.dim(_this4.id, percentageToBits(value), function (err) {
             if (!!err) callback(err, null);
             callback(null, value);
@@ -157,22 +157,22 @@ var TelldusDimmer = function (_TelldusAccessory) {
       this.log('Recieved set Dim-state request: ' + value);
       telldus.dim(this.id, percentageToBits(value), function (err) {
         if (!!err) callback(err, null);
-        _this5._setDimValue(value);
+        _this5._persistDimValue(value);
         //Let's set On-state to true
         _this5.service.setCharacteristic(_this5.Characteristic.On, true);
         callback(null, value);
       });
     }
   }, {
-    key: '_getDimValue',
-    value: function _getDimValue(callback) {
+    key: '_getPersistedDimValue',
+    value: function _getPersistedDimValue(callback) {
       this.db.each('SELECT value FROM dimmer WHERE dimmer_id = ' + this.id, function (row, err) {
-        callback(row);
+        callback(row.value);
       });
     }
   }, {
-    key: '_setDimValue',
-    value: function _setDimValue(value) {
+    key: '_persistDimValue',
+    value: function _persistDimValue(value) {
       this.db.run('UPDATE dimmer set value = ' + value + ' WHERE dimmer_id = ' + this.id);
     }
   }]);
