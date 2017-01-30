@@ -94,7 +94,7 @@ class TelldusTemperature extends TelldusAccessory {
         )
         let datetime = new Date().toISOString()
         this.db.run(`INSERT INTO sensor(sensor_id, type , datetime, value)
-                     VALUES(${this.id}, 'temperatur', date('${datetime}), ${value}')`);
+                     VALUES(${this.id}, 'temperatur', date('${datetime}'), ${value})`);
       }else{
         this.log(`Got humidity update: ${value} for ${this.name}`)
         this.service.getCharacteristic(this.Characteristic.CurrentRelativeHumidity)
