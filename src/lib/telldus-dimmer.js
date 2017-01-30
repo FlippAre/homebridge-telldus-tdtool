@@ -74,7 +74,7 @@ class TelldusDimmer extends TelldusAccessory {
       this.getState((err, state) => {
         if (!!err) callback(err, null)
         if(state.name == 'OFF'){
-          this._getDimValue((value) => {
+          this._getPersistedDimValue((value) => {
             this.log("Lightbulb is off and last brightness: " + value)
             callback(null, value)
           });
@@ -99,7 +99,7 @@ class TelldusDimmer extends TelldusAccessory {
      this.log('Recieved set On-state request: ' + value)
          if(value){
            // we would like it to return to old dim value
-           this._getDimValue((value) => {
+           this._getPersistedDimValue((value) => {
                telldus.dim(this.id, percentageToBits(value), (err) => {
                if (!!err) callback(err, null)
                callback(null, value)
@@ -127,7 +127,7 @@ class TelldusDimmer extends TelldusAccessory {
      this.log('Recieved set Dim-state request: ' + value)
        telldus.dim(this.id, percentageToBits(value), (err) => {
            if (!!err) callback(err, null)
-           this._setDimValue(value)
+           this._persistDimValue(value)
            //Let's set On-state to true
            this.service
             .setCharacteristic(this.Characteristic.On, true);
@@ -135,13 +135,13 @@ class TelldusDimmer extends TelldusAccessory {
        });
    }
 
-   _getDimValue(callback) {
+   _getPersistedDimValue(callback) {
      this.db.each(`SELECT value FROM dimmer WHERE dimmer_id = ${this.id}`, (row, err) => {
-       callback(row)
+       callback(row.value)
      });
    }
 
-   _setDimValue(value) {
+   _persistDimValue(value) {
      this.db.run(`UPDATE dimmer set value = ${value} WHERE dimmer_id = ${this.id}`);
    }
 
