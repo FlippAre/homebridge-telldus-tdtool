@@ -119,7 +119,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
           _this4.log('Got temperatur update: ' + value + ' for ' + _this4.name);
           _this4.service.getCharacteristic(_this4.Characteristic.CurrentTemperature).setValue(parseFloat(value));
           var datetime = new Date().toISOString();
-          _this4.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                     VALUES(' + _this4.id + ', \'temperatur\', date(\'' + datetime + '\'), ' + value + ')');
+          _this4.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                     VALUES(\'' + _this4.id + '\', \'temperatur\', datetime(\'' + datetime + '\'), ' + value + ')');
         } else {
           _this4.log('Got humidity update: ' + value + ' for ' + _this4.name);
           _this4.service.getCharacteristic(_this4.Characteristic.CurrentRelativeHumidity).setValue(parseFloat(value));
