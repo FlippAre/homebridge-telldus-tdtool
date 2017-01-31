@@ -106,4 +106,6 @@ class TelldusTemperature extends TelldusAccessory {
 
 }
 
+
+// select min(value) from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')
 module.exports = TelldusTemperature
