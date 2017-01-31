@@ -29,7 +29,7 @@ class TelldusTemperature extends TelldusAccessory {
     let Characteristic = homebridge.Characteristic
 
 
-     let DailyMaxTemperatureCharacteristics = () => {
+     let DailyMaxTemperature = () => {
           Characteristic.call(this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
           this.setProps({
               format: Characteristic.Formats.FLOAT,
@@ -44,7 +44,7 @@ class TelldusTemperature extends TelldusAccessory {
     inherits(DailyMaxTemperature, Characteristic);
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
-    this.service.addCharacteristic(DailyMaxTemperatureCharacteristics)
+    this.service.addCharacteristic(DailyMaxTemperature)
 
     // Should work with negative values
     this.service

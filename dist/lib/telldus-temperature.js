@@ -41,7 +41,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.db = db;
     var Characteristic = homebridge.Characteristic;
 
-    var DailyMaxTemperatureCharacteristics = function DailyMaxTemperatureCharacteristics() {
+    var DailyMaxTemperature = function DailyMaxTemperature() {
       Characteristic.call(_this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
       _this.setProps({
         format: Characteristic.Formats.FLOAT,
@@ -56,7 +56,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
     inherits(DailyMaxTemperature, Characteristic);
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
-    _this.service.addCharacteristic(DailyMaxTemperatureCharacteristics);
+    _this.service.addCharacteristic(DailyMaxTemperature);
 
     // Should work with negative values
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).props.minValue = -50;
