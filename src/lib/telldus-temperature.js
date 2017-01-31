@@ -46,8 +46,6 @@ class TelldusTemperature extends TelldusAccessory {
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
 
-    this.limiter = new RateLimiter(1, 30*1000) //limit to once ever 30s
-
   }
 
   /**
@@ -87,7 +85,6 @@ class TelldusTemperature extends TelldusAccessory {
   }
 
   respondToEvent(type, value) {
-    this.limiter.removeTokens(1, () => {
       if(type == 1){ 
         this.log(`Got temperatur update: ${value} for ${this.name}`)
         this.service.getCharacteristic(this.Characteristic.CurrentTemperature)
@@ -102,7 +99,6 @@ class TelldusTemperature extends TelldusAccessory {
           .setValue(parseFloat(value)
         )
       }
-    })
   }
 
 }
