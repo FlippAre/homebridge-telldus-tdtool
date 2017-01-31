@@ -9,6 +9,7 @@ var telldus = require('telldus');
 var TelldusDoor = require('./lib/telldus-door');
 var sqlite3 = require('sqlite3');
 var path = require('path');
+var inherits = require('util').inherits;
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -100,5 +101,21 @@ var TelldusTDToolPlatform = function () {
 
 
 module.exports = function (homebridge) {
+  var Characteristic = homebridge.hap.Characteristic;
+
+  var DailyMaxTemperature = function DailyMaxTemperature() {
+    Characteristic.call(undefined, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
+    undefined.setProps({
+      format: Characteristic.Formats.FLOAT,
+      unit: Characteristic.Units.CELSIUS,
+      maxValue: 100,
+      minValue: -100,
+      minStep: 0.1,
+      perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+    });
+    undefined.value = undefined.getDefaultValue();
+  };
+  inherits(DailyMaxTemperature, Characteristic);
+
   homebridge.registerPlatform('homebridge-telldus-tdtool', "Telldus-TD-Tool", TelldusTDToolPlatform);
 };

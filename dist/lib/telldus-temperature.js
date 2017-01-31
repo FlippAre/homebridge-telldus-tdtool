@@ -10,7 +10,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
-var inherits = require('util').inherits;
 
 /**
  * An Accessory convenience wrapper.
@@ -41,22 +40,8 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.db = db;
     var Characteristic = homebridge.Characteristic;
 
-    var DailyMaxTemperature = function DailyMaxTemperature() {
-      Characteristic.call(_this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
-      _this.setProps({
-        format: Characteristic.Formats.FLOAT,
-        unit: Characteristic.Units.CELSIUS,
-        maxValue: 100,
-        minValue: -100,
-        minStep: 0.1,
-        perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-      });
-      _this.value = _this.getDefaultValue();
-    };
-    inherits(DailyMaxTemperature, Characteristic);
-
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
-    _this.service.addCharacteristic(DailyMaxTemperature);
+    //this.service.addCharacteristic(DailyMaxTemperature)
 
     // Should work with negative values
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).props.minValue = -50;
