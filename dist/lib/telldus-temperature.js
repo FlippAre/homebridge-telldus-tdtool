@@ -41,7 +41,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.db = db;
     var Characteristic = homebridge.Characteristic;
 
-    DailyMaxTemperature = function DailyMaxTemperature() {
+    var DailyMaxTemperatureCharacteristics = function DailyMaxTemperatureCharacteristics() {
       Characteristic.call(_this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
       _this.setProps({
         format: Characteristic.Formats.FLOAT,

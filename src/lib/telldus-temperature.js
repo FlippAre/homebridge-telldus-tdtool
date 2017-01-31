@@ -29,7 +29,7 @@ class TelldusTemperature extends TelldusAccessory {
     let Characteristic = homebridge.Characteristic
 
 
-     DailyMaxTemperature = () => {
+     let DailyMaxTemperatureCharacteristics = () => {
           Characteristic.call(this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
           this.setProps({
               format: Characteristic.Formats.FLOAT,
