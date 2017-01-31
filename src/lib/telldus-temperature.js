@@ -1,8 +1,9 @@
 'use strict'
 
-const telldus =           require('telldus')
-const TelldusAccessory =  require('./telldus-accessory')
-const RateLimiter =       require('limiter').RateLimiter
+const telldus                             = require('telldus')
+const TelldusAccessory                    = require('./telldus-accessory')
+const RateLimiter                         = require('limiter').RateLimiter
+const DailyMaxTemperatureCharacteristics  = require('./CustomCharacteristics/DailyMaxTemperature')
 
 
 
@@ -31,6 +32,7 @@ class TelldusTemperature extends TelldusAccessory {
     
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
+    this.service.addCharacteristic(DailyMaxTemperatureCharacteristics)
 
     // Should work with negative values
     this.service

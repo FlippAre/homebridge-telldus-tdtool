@@ -11,6 +11,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
 var RateLimiter = require('limiter').RateLimiter;
+var DailyMaxTemperatureCharacteristics = require('./CustomCharacteristics/DailyMaxTemperature');
 
 /**
  * An Accessory convenience wrapper.
@@ -41,6 +42,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.db = db;
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
+    _this.service.addCharacteristic(DailyMaxTemperatureCharacteristics);
 
     // Should work with negative values
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).props.minValue = -50;
