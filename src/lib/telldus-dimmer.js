@@ -136,8 +136,7 @@ class TelldusDimmer extends TelldusAccessory {
    }
 
    _getPersistedDimValue(callback) {
-     this.db.each(`SELECT value FROM dimmer WHERE dimmer_id = ${this.id}`, (row, err) => {
-       console.log(row, err)
+     this.db.each(`SELECT value FROM dimmer WHERE dimmer_id = ${this.id}`, (err, row) => {
        callback(row.value)
      });
    }
