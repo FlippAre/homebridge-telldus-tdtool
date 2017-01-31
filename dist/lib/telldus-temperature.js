@@ -11,6 +11,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
 var RateLimiter = require('limiter').RateLimiter;
+
 /**
  * An Accessory convenience wrapper.
  */

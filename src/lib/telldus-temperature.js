@@ -3,6 +3,9 @@
 const telldus =           require('telldus')
 const TelldusAccessory =  require('./telldus-accessory')
 const RateLimiter =       require('limiter').RateLimiter
+
+
+
 /**
  * An Accessory convenience wrapper.
  */
@@ -105,6 +108,7 @@ class TelldusTemperature extends TelldusAccessory {
   }
 
 }
+
 
 
 // select min(value) from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')
