@@ -2,6 +2,10 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
@@ -101,21 +105,32 @@ var TelldusTDToolPlatform = function () {
 
 
 module.exports = function (homebridge) {
-  /*  let Characteristic = homebridge.hap.Characteristic;
-  
-    let DailyMaxTemperature = () => {
-      Characteristic.call(this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
-      this.setProps({
-          format: Characteristic.Formats.FLOAT,
-          unit: Characteristic.Units.CELSIUS,
-          maxValue: 100,
-          minValue: -100,
-          minStep: 0.1,
-          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+  var Characteristic = homebridge.hap.Characteristic;
+
+  var DailyMaxTemperature = function (_Characteristic) {
+    _inherits(DailyMaxTemperature, _Characteristic);
+
+    function DailyMaxTemperature() {
+      _classCallCheck(this, DailyMaxTemperature);
+
+      var _this2 = _possibleConstructorReturn(this, (DailyMaxTemperature.__proto__ || Object.getPrototypeOf(DailyMaxTemperature)).call(this));
+
+      _this2.setProps({
+        format: Characteristic.Formats.FLOAT,
+        unit: Characteristic.Units.CELSIUS,
+        maxValue: 100,
+        minValue: -100,
+        minStep: 0.1,
+        perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
       });
-      this.value = this.getDefaultValue();
+      _this2.value = _this2.getDefaultValue();
+      return _this2;
     }
-    inherits(DailyMaxTemperature, Characteristic);*/
+
+    return DailyMaxTemperature;
+  }(Characteristic);
+
+  Characteristic.call(DailyMaxTemperature, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
 
   homebridge.registerPlatform('homebridge-telldus-tdtool', "Telldus-TD-Tool", TelldusTDToolPlatform);
 };

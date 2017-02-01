@@ -89,21 +89,23 @@ class TelldusTDToolPlatform {
  * Register the Telldus tdtool platform as this module.
  */
 module.exports = homebridge => {
-/*  let Characteristic = homebridge.hap.Characteristic;
+  let Characteristic = homebridge.hap.Characteristic;
 
-  let DailyMaxTemperature = () => {
-    Characteristic.call(this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
-    this.setProps({
+  class DailyMaxTemperature extends Characteristic{
+    constructor(){
+      super()
+      this.setProps({
         format: Characteristic.Formats.FLOAT,
         unit: Characteristic.Units.CELSIUS,
         maxValue: 100,
         minValue: -100,
         minStep: 0.1,
         perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-    });
-    this.value = this.getDefaultValue();
+      });
+      this.value = this.getDefaultValue();
+    }
   }
-  inherits(DailyMaxTemperature, Characteristic);*/
+  Characteristic.call(DailyMaxTemperature, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
 
   homebridge.registerPlatform(
     'homebridge-telldus-tdtool', "Telldus-TD-Tool", TelldusTDToolPlatform)
