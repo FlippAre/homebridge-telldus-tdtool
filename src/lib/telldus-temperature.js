@@ -45,7 +45,7 @@ class TelldusTemperature extends TelldusAccessory {
     
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
-    this.service.addCharacteristic(DailyMaxTemperature)
+    //this.service.addCharacteristic(DailyMaxTemperature)
 
     // Should work with negative values
     this.service
@@ -60,9 +60,9 @@ class TelldusTemperature extends TelldusAccessory {
     .getCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     .on('get', this.getCurrentHumidity.bind(this))
 
-    this.service
+/*    this.service
     .getCharacteristic(DailyMaxTemperature)
-    .on('get', this.getDailyMaxTemperature.bind(this))
+    .on('get', this.getDailyMaxTemperature.bind(this))*/
 
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
