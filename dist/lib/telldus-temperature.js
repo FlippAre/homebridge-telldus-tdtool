@@ -38,10 +38,9 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.id = "sensor" + data.id;
     _this.service = new _this.Service.TemperatureSensor(_this.name);
     _this.db = db;
-    var Characteristic = homebridge.Characteristic;
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
-    //this.service.addCharacteristic(DailyMaxTemperature)
+    _this.service.addCharacteristic(_this.Characteristic.DailyMaxTemperature);
 
     // Should work with negative values
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).props.minValue = -50;
@@ -49,6 +48,8 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).on('get', _this.getCurrentTemperature.bind(_this));
 
     _this.service.getCharacteristic(_this.Characteristic.CurrentRelativeHumidity).on('get', _this.getCurrentHumidity.bind(_this));
+
+    _this.service.getCharacteristic(_this.Characteristic.DailyMaxTemperature).on('get', _this.getDailyMaxTemperature.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "TemperatureSensor");
 
@@ -108,6 +109,11 @@ var TelldusTemperature = function (_TelldusAccessory) {
         _this3.log("Humidity is: " + humidity);
         callback(null, parseFloat(humidity));
       });
+    }
+  }, {
+    key: 'getDailyMaxTemperature',
+    value: function getDailyMaxTemperature(callback) {
+      callback(null, 10);
     }
   }, {
     key: 'respondToEvent',

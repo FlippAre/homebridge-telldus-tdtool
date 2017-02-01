@@ -25,10 +25,9 @@ class TelldusTemperature extends TelldusAccessory {
     this.id = "sensor" + data.id
     this.service = new this.Service.TemperatureSensor(this.name)
     this.db = db
-    let Characteristic = homebridge.Characteristic
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
-    //this.service.addCharacteristic(DailyMaxTemperature)
+    this.service.addCharacteristic(this.Characteristic.DailyMaxTemperature)
 
     // Should work with negative values
     this.service
@@ -42,6 +41,10 @@ class TelldusTemperature extends TelldusAccessory {
     this.service
     .getCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     .on('get', this.getCurrentHumidity.bind(this))
+
+    this.service
+    .getCharacteristic(this.Characteristic.DailyMaxTemperature)
+    .on('get', this.getDailyMaxTemperature.bind(this))
 
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
@@ -82,6 +85,10 @@ class TelldusTemperature extends TelldusAccessory {
         this.log("Humidity is: " + humidity)
         callback(null, parseFloat(humidity))
       })
+  }
+
+  getDailyMaxTemperature(callback){
+    callback(null, 10)
   }
 
   respondToEvent(type, value) {
