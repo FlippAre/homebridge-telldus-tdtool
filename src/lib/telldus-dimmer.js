@@ -137,7 +137,7 @@ class TelldusDimmer extends TelldusAccessory {
    }
 
    _getPersistedDimValue(callback) {
-     db.serialize(() => {
+     this.db.serialize(() => {
       this.db.each(`SELECT value FROM dimmer WHERE dimmer_id = ${this.id}`, (err, row) => {
         callback(row.value)
       })
@@ -145,7 +145,7 @@ class TelldusDimmer extends TelldusAccessory {
    }
 
    _persistDimValue(value) {
-     db.serialize(() => {
+     this.db.serialize(() => {
       this.db.run(`UPDATE dimmer set value = ${value} WHERE dimmer_id = ${this.id}`);
      });
    }

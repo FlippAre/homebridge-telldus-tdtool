@@ -91,7 +91,7 @@ class TelldusTemperature extends TelldusAccessory {
           .setValue(parseFloat(value)
         )
         let datetime = new Date().toISOString()
-        db.serialize(() => {
+        this.db.serialize(() => {
           this.db.run(`INSERT INTO sensor(sensor_id, type , datetime, value)
                       VALUES('${this.id}', 'temperatur', datetime('${datetime}'), ${value})`);
         })
