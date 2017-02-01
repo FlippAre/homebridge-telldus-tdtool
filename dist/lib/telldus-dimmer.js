@@ -169,7 +169,7 @@ var TelldusDimmer = function (_TelldusAccessory) {
     value: function _getPersistedDimValue(callback) {
       var _this6 = this;
 
-      db.serialize(function () {
+      this.db.serialize(function () {
         _this6.db.each('SELECT value FROM dimmer WHERE dimmer_id = ' + _this6.id, function (err, row) {
           callback(row.value);
         });
@@ -180,7 +180,7 @@ var TelldusDimmer = function (_TelldusAccessory) {
     value: function _persistDimValue(value) {
       var _this7 = this;
 
-      db.serialize(function () {
+      this.db.serialize(function () {
         _this7.db.run('UPDATE dimmer set value = ' + value + ' WHERE dimmer_id = ' + _this7.id);
       });
     }
