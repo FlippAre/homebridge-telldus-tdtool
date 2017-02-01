@@ -23,7 +23,7 @@ var TelldusTDToolPlatform = function () {
     this.log = log;
     this.config = config;
     this.homebridge = homebridge;
-    var db = new sqlite3.Database(path.join(homebridge.user.persistPath()(), "telldus.db"));
+    var db = new sqlite3.Database(path.join(homebridge.user.persistPath(), "telldus.db"));
     db.serialize(function () {
       db.run("CREATE TABLE IF NOT EXISTS dimmer (dimmer_id INTEGER, value INTEGER, UNIQUE(dimmer_id))");
       db.run("CREATE TABLE IF NOT EXISTS sensor (sensor_id TEXT, type TEXT, datetime DATETIME, value REAL)");
