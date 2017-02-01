@@ -38,31 +38,23 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.id = "sensor" + data.id;
     _this.service = new _this.Service.TemperatureSensor(_this.name);
     _this.db = db;
-    var Characteristic = homebridge.hap.Characteristic;
-
-    var DailyMaxTemperature = function (_Characteristic) {
-      _inherits(DailyMaxTemperature, _Characteristic);
-
-      function DailyMaxTemperature() {
-        _classCallCheck(this, DailyMaxTemperature);
-
-        var _this2 = _possibleConstructorReturn(this, (DailyMaxTemperature.__proto__ || Object.getPrototypeOf(DailyMaxTemperature)).call(this));
-
-        Characteristic.call(_this2, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
-        _this2.setProps({
-          format: Characteristic.Formats.FLOAT,
-          unit: Characteristic.Units.CELSIUS,
-          maxValue: 100,
-          minValue: -100,
-          minStep: 0.1,
-          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-        });
-        _this2.value = _this2.getDefaultValue();
-        return _this2;
-      }
-
-      return DailyMaxTemperature;
-    }(Characteristic);
+    /*    let Characteristic = homebridge.hap.Characteristic;
+    
+        class DailyMaxTemperature extends Characteristic{
+          constructor(){
+            super()
+            Characteristic.call(this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
+            this.setProps({
+              format: Characteristic.Formats.FLOAT,
+              unit: Characteristic.Units.CELSIUS,
+              maxValue: 100,
+              minValue: -100,
+              minStep: 0.1,
+              perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+            });
+            this.value = this.getDefaultValue();
+          }
+        }*/
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
     //this.service.addCharacteristic(DailyMaxTemperature)
@@ -94,19 +86,19 @@ var TelldusTemperature = function (_TelldusAccessory) {
   _createClass(TelldusTemperature, [{
     key: 'getCurrentTemperature',
     value: function getCurrentTemperature(callback) {
-      var _this3 = this;
+      var _this2 = this;
 
       this.log("Getting temperature...");
 
       telldus.getSensors(function (err, sensors) {
         if (!!err) callback(err, null);
         var temperaturSensor = sensors.find(function (sensor) {
-          return 'sensor' + sensor.id === _this3.id;
+          return 'sensor' + sensor.id === _this2.id;
         });
         var temperature = temperaturSensor.data.find(function (data) {
           return data.type === "TEMPERATURE";
         }).value;
-        _this3.log("Temperatur is: " + temperature);
+        _this2.log("Temperatur is: " + temperature);
         callback(null, parseFloat(temperature));
       });
     }
@@ -121,19 +113,19 @@ var TelldusTemperature = function (_TelldusAccessory) {
   }, {
     key: 'getCurrentHumidity',
     value: function getCurrentHumidity(callback) {
-      var _this4 = this;
+      var _this3 = this;
 
       this.log("Getting humidity...");
 
       telldus.getSensors(function (err, sensors) {
         if (!!err) callback(err, null);
         var temperaturSensor = sensors.find(function (sensor) {
-          return "sensor" + sensor.id === _this4.id;
+          return "sensor" + sensor.id === _this3.id;
         });
         var humidity = temperaturSensor.data.find(function (data) {
           return data.type === "HUMIDITY";
         }).value;
-        _this4.log("Humidity is: " + humidity);
+        _this3.log("Humidity is: " + humidity);
         callback(null, parseFloat(humidity));
       });
     }
@@ -145,15 +137,15 @@ var TelldusTemperature = function (_TelldusAccessory) {
   }, {
     key: 'respondToEvent',
     value: function respondToEvent(type, value) {
-      var _this5 = this;
+      var _this4 = this;
 
       if (type == 1) {
         (function () {
-          _this5.log('Got temperatur update: ' + value + ' for ' + _this5.name);
-          _this5.service.getCharacteristic(_this5.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+          _this4.log('Got temperatur update: ' + value + ' for ' + _this4.name);
+          _this4.service.getCharacteristic(_this4.Characteristic.CurrentTemperature).setValue(parseFloat(value));
           var datetime = new Date().toISOString();
-          _this5.db.serialize(function () {
-            _this5.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                      VALUES(\'' + _this5.id + '\', \'temperatur\', datetime(\'' + datetime + '\'), ' + value + ')');
+          _this4.db.serialize(function () {
+            _this4.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                      VALUES(\'' + _this4.id + '\', \'temperatur\', datetime(\'' + datetime + '\'), ' + value + ')');
           });
         })();
       } else {

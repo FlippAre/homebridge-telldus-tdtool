@@ -25,7 +25,7 @@ class TelldusTemperature extends TelldusAccessory {
     this.id = "sensor" + data.id
     this.service = new this.Service.TemperatureSensor(this.name)
     this.db = db
-    let Characteristic = homebridge.hap.Characteristic;
+/*    let Characteristic = homebridge.hap.Characteristic;
 
     class DailyMaxTemperature extends Characteristic{
       constructor(){
@@ -41,7 +41,7 @@ class TelldusTemperature extends TelldusAccessory {
         });
         this.value = this.getDefaultValue();
       }
-    }
+    }*/
     
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
