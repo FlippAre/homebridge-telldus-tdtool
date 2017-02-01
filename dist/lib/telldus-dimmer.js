@@ -47,8 +47,9 @@ var TelldusDimmer = function (_TelldusAccessory) {
     var _this = _possibleConstructorReturn(this, (TelldusDimmer.__proto__ || Object.getPrototypeOf(TelldusDimmer)).call(this, data, log, homebridge, config));
 
     _this.db = db;
-    _this.db.run('INSERT OR IGNORE INTO dimmer(dimmer_id, value) VALUES(' + _this.id + ', 0)');
-    //TelldusStorage.initSync({ dir: path.join(homebridge.user.storagePath(), "telldus") })
+    db.serialize(function () {
+      _this.db.run('INSERT OR IGNORE INTO dimmer(dimmer_id, value) VALUES(' + _this.id + ', 0)');
+    });
 
     _this.service.getCharacteristic(_this.Characteristic.On).on('get', _this.getOnState.bind(_this)).on('set', _this.setOnState.bind(_this));
 
@@ -166,14 +167,22 @@ var TelldusDimmer = function (_TelldusAccessory) {
   }, {
     key: '_getPersistedDimValue',
     value: function _getPersistedDimValue(callback) {
-      this.db.each('SELECT value FROM dimmer WHERE dimmer_id = ' + this.id, function (err, row) {
-        callback(row.value);
+      var _this6 = this;
+
+      db.serialize(function () {
+        _this6.db.each('SELECT value FROM dimmer WHERE dimmer_id = ' + _this6.id, function (err, row) {
+          callback(row.value);
+        });
       });
     }
   }, {
     key: '_persistDimValue',
     value: function _persistDimValue(value) {
-      this.db.run('UPDATE dimmer set value = ' + value + ' WHERE dimmer_id = ' + this.id);
+      var _this7 = this;
+
+      db.serialize(function () {
+        _this7.db.run('UPDATE dimmer set value = ' + value + ' WHERE dimmer_id = ' + _this7.id);
+      });
     }
   }]);
 

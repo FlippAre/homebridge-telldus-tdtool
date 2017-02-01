@@ -31,8 +31,9 @@ class TelldusDimmer extends TelldusAccessory {
   constructor(data, log, homebridge, config, db) {
     super(data, log, homebridge, config)
     this.db = db
-    this.db.run(`INSERT OR IGNORE INTO dimmer(dimmer_id, value) VALUES(${this.id}, 0)`);
-    //TelldusStorage.initSync({ dir: path.join(homebridge.user.storagePath(), "telldus") })
+    db.serialize(() => {
+      this.db.run(`INSERT OR IGNORE INTO dimmer(dimmer_id, value) VALUES(${this.id}, 0)`);
+    })
 
     this.service
     .getCharacteristic(this.Characteristic.On)
@@ -136,13 +137,17 @@ class TelldusDimmer extends TelldusAccessory {
    }
 
    _getPersistedDimValue(callback) {
-     this.db.each(`SELECT value FROM dimmer WHERE dimmer_id = ${this.id}`, (err, row) => {
-       callback(row.value)
-     });
+     db.serialize(() => {
+      this.db.each(`SELECT value FROM dimmer WHERE dimmer_id = ${this.id}`, (err, row) => {
+        callback(row.value)
+      })
+     })
    }
 
    _persistDimValue(value) {
-     this.db.run(`UPDATE dimmer set value = ${value} WHERE dimmer_id = ${this.id}`);
+     db.serialize(() => {
+      this.db.run(`UPDATE dimmer set value = ${value} WHERE dimmer_id = ${this.id}`);
+     });
    }
 
 }

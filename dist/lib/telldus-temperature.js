@@ -73,7 +73,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
       telldus.getSensors(function (err, sensors) {
         if (!!err) callback(err, null);
         var temperaturSensor = sensors.find(function (sensor) {
-          return "sensor" + sensor.id === _this2.id;
+          return 'sensor' + sensor.id === _this2.id;
         });
         var temperature = temperaturSensor.data.find(function (data) {
           return data.type === "TEMPERATURE";
@@ -112,11 +112,17 @@ var TelldusTemperature = function (_TelldusAccessory) {
   }, {
     key: 'respondToEvent',
     value: function respondToEvent(type, value) {
+      var _this4 = this;
+
       if (type == 1) {
-        this.log('Got temperatur update: ' + value + ' for ' + this.name);
-        this.service.getCharacteristic(this.Characteristic.CurrentTemperature).setValue(parseFloat(value));
-        var datetime = new Date().toISOString();
-        this.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                     VALUES(\'' + this.id + '\', \'temperatur\', datetime(\'' + datetime + '\'), ' + value + ')');
+        (function () {
+          _this4.log('Got temperatur update: ' + value + ' for ' + _this4.name);
+          _this4.service.getCharacteristic(_this4.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+          var datetime = new Date().toISOString();
+          db.serialize(function () {
+            _this4.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                      VALUES(\'' + _this4.id + '\', \'temperatur\', datetime(\'' + datetime + '\'), ' + value + ')');
+          });
+        })();
       } else {
         this.log('Got humidity update: ' + value + ' for ' + this.name);
         this.service.getCharacteristic(this.Characteristic.CurrentRelativeHumidity).setValue(parseFloat(value));

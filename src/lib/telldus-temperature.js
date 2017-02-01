@@ -59,7 +59,7 @@ class TelldusTemperature extends TelldusAccessory {
 
       telldus.getSensors((err, sensors) => {
         if (!!err) callback(err, null)
-        let temperaturSensor = sensors.find((sensor) => "sensor" + sensor.id === this.id)
+        let temperaturSensor = sensors.find((sensor) => `sensor${sensor.id}` === this.id)
         let temperature = temperaturSensor.data.find((data) => data.type === "TEMPERATURE").value
         this.log("Temperatur is: " + temperature)
         callback(null, parseFloat(temperature))
@@ -91,8 +91,10 @@ class TelldusTemperature extends TelldusAccessory {
           .setValue(parseFloat(value)
         )
         let datetime = new Date().toISOString()
-        this.db.run(`INSERT INTO sensor(sensor_id, type , datetime, value)
-                     VALUES('${this.id}', 'temperatur', datetime('${datetime}'), ${value})`);
+        db.serialize(() => {
+          this.db.run(`INSERT INTO sensor(sensor_id, type , datetime, value)
+                      VALUES('${this.id}', 'temperatur', datetime('${datetime}'), ${value})`);
+        })
       }else{
         this.log(`Got humidity update: ${value} for ${this.name}`)
         this.service.getCharacteristic(this.Characteristic.CurrentRelativeHumidity)
