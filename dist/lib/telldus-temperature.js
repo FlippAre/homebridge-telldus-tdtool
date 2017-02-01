@@ -48,6 +48,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
         var _this2 = _possibleConstructorReturn(this, (DailyMaxTemperature.__proto__ || Object.getPrototypeOf(DailyMaxTemperature)).call(this));
 
+        Characteristic.call(_this2, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
         _this2.setProps({
           format: Characteristic.Formats.FLOAT,
           unit: Characteristic.Units.CELSIUS,
@@ -62,8 +63,6 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
       return DailyMaxTemperature;
     }(Characteristic);
-
-    Characteristic.call(DailyMaxTemperature, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
     _this.service.addCharacteristic(DailyMaxTemperature);

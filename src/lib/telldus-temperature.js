@@ -30,6 +30,7 @@ class TelldusTemperature extends TelldusAccessory {
     class DailyMaxTemperature extends Characteristic{
       constructor(){
         super()
+        Characteristic.call(this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
         this.setProps({
           format: Characteristic.Formats.FLOAT,
           unit: Characteristic.Units.CELSIUS,
@@ -41,7 +42,7 @@ class TelldusTemperature extends TelldusAccessory {
         this.value = this.getDefaultValue();
       }
     }
-    Characteristic.call(DailyMaxTemperature, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
+    
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     this.service.addCharacteristic(DailyMaxTemperature)
