@@ -2,6 +2,7 @@
 
 const telldus                             = require('telldus')
 const TelldusAccessory                    = require('./telldus-accessory')
+const inherits                            = require('util').inherits;
 
 /**
  * An Accessory convenience wrapper.
@@ -27,25 +28,24 @@ class TelldusTemperature extends TelldusAccessory {
     this.db = db
     let Characteristic = homebridge.hap.Characteristic;
 
-    class DailyMaxTemperature extends Characteristic{
-      constructor(){
-        super()
-        Characteristic.call(this, 'Daily Max Temp', '00000011-0000-1000-8000-MAX6BB765291');
-        this.setProps({
+    let DailyMaxTemperature = () => {
+      Characteristic.call(this, 'Accessory Flags', '0000FF11-0000-1000-8000-0026BB765291');
+      this.setProps({
           format: Characteristic.Formats.FLOAT,
           unit: Characteristic.Units.CELSIUS,
           maxValue: 100,
           minValue: -100,
           minStep: 0.1,
           perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-        });
-        this.value = this.getDefaultValue();
-      }
-    }
-    
+      });
+      this.value = this.getDefaultValue();
+    };
+
+    inherits(Characteristic.AccessoryFlags, Characteristic);
+    DailyMaxTemperature.UUID = '0000FF11-0000-1000-8000-0026BB765291'
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
-    //this.service.addCharacteristic(DailyMaxTemperature)
+    this.service.addCharacteristic(DailyMaxTemperature)
 
     // Should work with negative values
     this.service

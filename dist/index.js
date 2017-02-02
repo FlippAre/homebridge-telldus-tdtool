@@ -6,10 +6,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var TelldusAccessoryFactory = require('./lib/telldus-accessory-factory');
 var telldus = require('telldus');
-var TelldusDoor = require('./lib/telldus-door');
 var sqlite3 = require('sqlite3');
 var path = require('path');
-var inherits = require('util').inherits;
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -80,7 +78,7 @@ var TelldusTDToolPlatform = function () {
         }
       });
 
-      telldus.addSensorEventListener(function (deviceId, protocol, model, type, value, timestamp) {
+      telldus.addSensorEventListener(function (deviceId, protocol, model, type, value) {
         var id = 'sensor' + deviceId;
         var a = telldusAccessories.find(function (accessory) {
           return accessory.id == id;

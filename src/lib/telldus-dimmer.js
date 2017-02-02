@@ -2,7 +2,6 @@
 
 const telldus = require('telldus');
 const TelldusAccessory = require('./telldus-accessory')
-const path = require('path');
 //var TelldusStorage = require('node-persist')
 
 // Convert 0-255 to 0-100

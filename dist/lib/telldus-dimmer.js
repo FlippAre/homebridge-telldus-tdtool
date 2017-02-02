@@ -10,7 +10,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var telldus = require('telldus');
 var TelldusAccessory = require('./telldus-accessory');
-var path = require('path');
 //var TelldusStorage = require('node-persist')
 
 // Convert 0-255 to 0-100

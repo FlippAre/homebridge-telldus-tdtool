@@ -2,10 +2,8 @@
 
 const TelldusAccessoryFactory    = require('./lib/telldus-accessory-factory')
 const telldus                    = require('telldus');
-const TelldusDoor                = require('./lib/telldus-door')
 const sqlite3                    = require('sqlite3')
 const path                       = require('path')
-const inherits                   = require('util').inherits;
 
 /**
  * Platform wrapper that fetches the accessories connected to the
@@ -75,7 +73,7 @@ class TelldusTDToolPlatform {
       }
     })
 
-    telldus.addSensorEventListener((deviceId,protocol,model,type,value,timestamp) => {
+    telldus.addSensorEventListener((deviceId,protocol,model,type,value) => {
       let id = `sensor${deviceId}`
       let a = telldusAccessories.find(accessory => accessory.id == id )
       if(a && a.respondToEvent){
