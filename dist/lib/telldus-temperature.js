@@ -42,7 +42,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
     var Characteristic = homebridge.hap.Characteristic;
 
     var DailyMaxTemperature = function DailyMaxTemperature() {
-      Characteristic.call(_this, 'Accessory Flags', '0000FF11-0000-1000-8000-0026BB765291');
+      Characteristic.call(_this, 'Daily Max Temperature', '0000FF11-0000-1000-8000-0026BB765291');
       _this.setProps({
         format: Characteristic.Formats.FLOAT,
         unit: Characteristic.Units.CELSIUS,
@@ -54,7 +54,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
       _this.value = _this.getDefaultValue();
     };
 
-    inherits(Characteristic.AccessoryFlags, Characteristic);
+    inherits(DailyMaxTemperature, Characteristic);
     DailyMaxTemperature.UUID = '0000FF11-0000-1000-8000-0026BB765291';
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
@@ -67,9 +67,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
     _this.service.getCharacteristic(_this.Characteristic.CurrentRelativeHumidity).on('get', _this.getCurrentHumidity.bind(_this));
 
-    /*    this.service
-        .getCharacteristic(DailyMaxTemperature)
-        .on('get', this.getDailyMaxTemperature.bind(this))*/
+    _this.service.getCharacteristic(DailyMaxTemperature).on('get', _this.getDailyMaxTemperature.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "TemperatureSensor");
 
