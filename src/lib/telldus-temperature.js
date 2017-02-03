@@ -34,11 +34,12 @@ class TelldusTemperature extends TelldusAccessory {
           this.props.minValue = -50
         }
     }
-    //DailyMaxTemperature.prototype.UUID = '0000FF11-0000-1000-8000-0026BB765291'
+    DailyMaxTemperature.UUID = '0000FF11-0000-1000-8000-0026BB765291'
     //DailyMaxTemperature.prototype.displayName = "Daily Max Temperature"
+    console.log(DailyMaxTemperature);
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
-    this.service.addCharacteristic(new DailyMaxTemperature())
+    this.service.addCharacteristic(DailyMaxTemperature)
 
     console.log(this.service
     .getCharacteristic(DailyMaxTemperature))

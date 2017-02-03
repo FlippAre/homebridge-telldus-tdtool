@@ -54,11 +54,13 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
       return DailyMaxTemperature;
     }(_this.Characteristic.CurrentTemperature);
-    //DailyMaxTemperature.prototype.UUID = '0000FF11-0000-1000-8000-0026BB765291'
+
+    DailyMaxTemperature.UUID = '0000FF11-0000-1000-8000-0026BB765291';
     //DailyMaxTemperature.prototype.displayName = "Daily Max Temperature"
+    console.log(DailyMaxTemperature);
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
-    _this.service.addCharacteristic(new DailyMaxTemperature());
+    _this.service.addCharacteristic(DailyMaxTemperature);
 
     console.log(_this.service.getCharacteristic(DailyMaxTemperature));
 
