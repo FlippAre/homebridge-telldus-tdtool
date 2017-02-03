@@ -60,6 +60,8 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
     _this.service.addCharacteristic(DailyMaxTemperature);
 
+    console.log(_this.service.getCharacteristic(DailyMaxTemperature));
+
     // Should work with negative values
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).props.minValue = -50;
 
