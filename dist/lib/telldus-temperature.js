@@ -39,7 +39,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.id = "sensor" + data.id;
     _this.service = new _this.Service.TemperatureSensor(_this.name);
     _this.db = db;
-    var Characteristic = _this.homebridge.Characteristic;
+    var Characteristic = homebridge.hap.Characteristic;
 
     var DailyMaxTemperature = function DailyMaxTemperature() {
       Characteristic.call(DailyMaxTemperature, 'Current Temperature', '0000FA87-0000-1000-8000-0026BB765291');

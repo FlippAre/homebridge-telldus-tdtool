@@ -27,7 +27,7 @@ class TelldusTemperature extends TelldusAccessory {
     this.id = "sensor" + data.id
     this.service = new this.Service.TemperatureSensor(this.name)
     this.db = db
-    let Characteristic = this.homebridge.Characteristic
+    let Characteristic = homebridge.hap.Characteristic
     
     let DailyMaxTemperature = function () {
       Characteristic.call(DailyMaxTemperature, 'Current Temperature', '0000FA87-0000-1000-8000-0026BB765291');
