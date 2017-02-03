@@ -7,6 +7,7 @@ const inherits                            = require('util').inherits;
 /**
  * An Accessory convenience wrapper.
  */
+
 class TelldusTemperature extends TelldusAccessory {
 
   /**
@@ -26,23 +27,15 @@ class TelldusTemperature extends TelldusAccessory {
     this.id = "sensor" + data.id
     this.service = new this.Service.TemperatureSensor(this.name)
     this.db = db
-    let Characteristic = homebridge.hap.Characteristic;
-
-    let DailyMaxTemperature = () => {
-      Characteristic.call(this, 'Daily Max Temperature', '0000FF11-0000-1000-8000-0026BB765291');
-      this.setProps({
-          format: Characteristic.Formats.FLOAT,
-          unit: Characteristic.Units.CELSIUS,
-          maxValue: 100,
-          minValue: -100,
-          minStep: 0.1,
-          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-      });
-      this.value = this.getDefaultValue();
-    };
-
-    inherits(DailyMaxTemperature, Characteristic);
-    DailyMaxTemperature.UUID = '0000FF11-0000-1000-8000-0026BB765291'
+    
+    class DailyMaxTemperature extends this.Characteristic.CurrentTemperature {
+        constructor(){
+          super()
+          this.UUID = '0000FF11-0000-1000-8000-0026BB765291'
+          this.displayName = "Daily Max Temperature"
+          this.props.minValue = -50
+        }
+    }
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     this.service.addCharacteristic(DailyMaxTemperature)
