@@ -30,7 +30,7 @@ class TelldusTemperature extends TelldusAccessory {
     let Characteristic = homebridge.hap.Characteristic
     
     let DailyMaxTemperature = function () {
-      Characteristic.call(this, 'Daily Max Temperature', '0000FA87-0000-1000-8000-0026BB765291');
+      Characteristic.call(this, 'Daily Max Temperature', '422693A4-2703-4AE2-AF6A-8D40B2DE3A33');
       this.setProps({
           format: Characteristic.Formats.FLOAT,
           unit: Characteristic.Units.CELSIUS,
@@ -43,14 +43,14 @@ class TelldusTemperature extends TelldusAccessory {
     };
     inherits(DailyMaxTemperature, Characteristic);
 
-    //DailyMaxTemperature.prototype.displayName = "Daily Max Temperature"
-    //console.log(DailyMaxTemperature);
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     this.service.addCharacteristic(DailyMaxTemperature)
 
     console.log(this.service
     .getCharacteristic(DailyMaxTemperature))
+    console.log(this.service
+    .getCharacteristic(this.Characteristic.CurrentTemperature))
 
     // Should work with negative values
     this.service
