@@ -30,9 +30,7 @@ class TelldusTemperature extends TelldusAccessory {
     
     class DailyMaxTemperature extends this.Characteristic.CurrentTemperature {
         constructor(){
-          super()
-          this.UUID = '0000FF11-0000-1000-8000-0026BB765291'
-          this.displayName = "Daily Max Temperature"
+          super('Daily Max Temperature', '0000FF11-0000-1000-8000-0026BB765291')
           this.props.minValue = -50
         }
     }
