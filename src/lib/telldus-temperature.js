@@ -30,8 +30,8 @@ class TelldusTemperature extends TelldusAccessory {
     let Characteristic = homebridge.hap.Characteristic
     
     let DailyMaxTemperature = function () {
-      Characteristic.call(DailyMaxTemperature, 'Current Temperature', '0000FA87-0000-1000-8000-0026BB765291');
-      DailyMaxTemperature.setProps({
+      Characteristic.call(this, 'Daily Max Temperature', '0000FA87-0000-1000-8000-0026BB765291');
+      this.setProps({
           format: Characteristic.Formats.FLOAT,
           unit: Characteristic.Units.CELSIUS,
           maxValue: 100,
@@ -39,15 +39,12 @@ class TelldusTemperature extends TelldusAccessory {
           minStep: 0.1,
           perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
       });
-      DailyMaxTemperature.value = DailyMaxTemperature.getDefaultValue();
+      this.value = DailyMaxTemperature.getDefaultValue();
     };
     inherits(DailyMaxTemperature, Characteristic);
 
-    DailyMaxTemperature.displayName = 'Daily Max Temperature'
-    DailyMaxTemperature.UUID = '0000FF11-0000-1000-8000-0026BB765291'
-
     //DailyMaxTemperature.prototype.displayName = "Daily Max Temperature"
-    console.log(DailyMaxTemperature);
+    //console.log(DailyMaxTemperature);
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     this.service.addCharacteristic(DailyMaxTemperature)
