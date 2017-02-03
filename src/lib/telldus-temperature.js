@@ -27,15 +27,25 @@ class TelldusTemperature extends TelldusAccessory {
     this.id = "sensor" + data.id
     this.service = new this.Service.TemperatureSensor(this.name)
     this.db = db
+    let Characteristic = this.homebridge.Characteristic
     
-    class DailyMaxTemperature extends this.Characteristic.CurrentTemperature {
-        constructor(displayName, UUID){
-          super(displayName, UUID)
-        }
-    }
+    let DailyMaxTemperature = function () {
+      Characteristic.call(DailyMaxTemperature, 'Current Temperature', '0000FA87-0000-1000-8000-0026BB765291');
+      DailyMaxTemperature.setProps({
+          format: Characteristic.Formats.FLOAT,
+          unit: Characteristic.Units.CELSIUS,
+          maxValue: 100,
+          minValue: 0,
+          minStep: 0.1,
+          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+      });
+      DailyMaxTemperature.value = DailyMaxTemperature.getDefaultValue();
+    };
+    inherits(DailyMaxTemperature, Characteristic);
+
     DailyMaxTemperature.displayName = 'Daily Max Temperature'
     DailyMaxTemperature.UUID = '0000FF11-0000-1000-8000-0026BB765291'
-    
+
     //DailyMaxTemperature.prototype.displayName = "Daily Max Temperature"
     console.log(DailyMaxTemperature);
 
