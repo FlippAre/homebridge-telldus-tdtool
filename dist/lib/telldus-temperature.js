@@ -46,12 +46,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
       function DailyMaxTemperature() {
         _classCallCheck(this, DailyMaxTemperature);
 
-        var _this2 = _possibleConstructorReturn(this, (DailyMaxTemperature.__proto__ || Object.getPrototypeOf(DailyMaxTemperature)).call(this));
-
-        _this2.UUID = '0000FF11-0000-1000-8000-0026BB765291';
-        _this2.displayName = "Daily Max Temperature";
-        _this2.props.minValue = -50;
-        return _this2;
+        return _possibleConstructorReturn(this, (DailyMaxTemperature.__proto__ || Object.getPrototypeOf(DailyMaxTemperature)).apply(this, arguments));
       }
 
       return DailyMaxTemperature;
@@ -59,7 +54,6 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
     DailyMaxTemperature.prototype.UUID = '0000FF11-0000-1000-8000-0026BB765291';
     DailyMaxTemperature.prototype.displayName = "Daily Max Temperature";
-    DailyMaxTemperature.prototype.props.minValue = -50;
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
     _this.service.addCharacteristic(DailyMaxTemperature);
