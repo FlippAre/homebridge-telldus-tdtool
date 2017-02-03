@@ -51,7 +51,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
         minStep: 0.1,
         perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
       });
-      this.value = DailyMaxTemperature.getDefaultValue();
+      this.value = this.getDefaultValue();
     };
     inherits(DailyMaxTemperature, Characteristic);
 
