@@ -55,7 +55,7 @@ class TelldusTemperature extends TelldusAccessory {
       });
       this.value = this.getDefaultValue();
     };
-    inherits(DailyMaxTemperature, Characteristic);
+    inherits(DailyMinTemperature, Characteristic);
 
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)

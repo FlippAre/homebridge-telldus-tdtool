@@ -67,7 +67,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
       });
       this.value = this.getDefaultValue();
     };
-    inherits(DailyMaxTemperature, Characteristic);
+    inherits(DailyMinTemperature, Characteristic);
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
     _this.service.addCharacteristic(DailyMaxTemperature);
