@@ -149,7 +149,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
       var _this4 = this;
 
       this.db.serialize(function () {
-        _this4.db.each("select max(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", function (err, row) {
+        _this4.db.each('SELECT MAX(value) as value\n         FROM sensor \n         WHERE sensor_id = \'' + _this4.id + '\'\n         AND datetime > datetime(\'now\',\'start of day\')', function (err, row) {
           callback(null, row.value);
         });
       });
@@ -160,7 +160,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
       var _this5 = this;
 
       this.db.serialize(function () {
-        _this5.db.each("select min(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", function (err, row) {
+        _this5.db.each('SELECT MIN(value) as value\n         FROM sensor \n         WHERE sensor_id = \'' + _this5.id + '\'\n         AND datetime > datetime(\'now\',\'start of day\')', function (err, row) {
           callback(null, row.value);
         });
       });

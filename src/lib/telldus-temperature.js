@@ -126,16 +126,26 @@ class TelldusTemperature extends TelldusAccessory {
 
   getDailyMaxTemperature(callback){
     this.db.serialize(() => {
-      this.db.each("select max(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", (err, row) =>{
-        callback(null, row.value)
+      this.db.each(
+        `SELECT MAX(value) as value
+         FROM sensor 
+         WHERE sensor_id = '${this.id}'
+         AND datetime > datetime('now','start of day')`,
+         (err, row) => {
+          callback(null, row.value)
       });
     });
   }
 
   getDailyMinTemperature(callback){
     this.db.serialize(() => {
-      this.db.each("select min(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", (err, row) =>{
-        callback(null, row.value)
+      this.db.each(
+        `SELECT MIN(value) as value
+         FROM sensor 
+         WHERE sensor_id = '${this.id}'
+         AND datetime > datetime('now','start of day')`,
+         (err, row) =>{
+          callback(null, row.value)
       });
     });
   }
