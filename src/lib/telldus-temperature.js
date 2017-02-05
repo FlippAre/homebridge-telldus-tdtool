@@ -35,7 +35,21 @@ class TelldusTemperature extends TelldusAccessory {
           format: Characteristic.Formats.FLOAT,
           unit: Characteristic.Units.CELSIUS,
           maxValue: 100,
-          minValue: 0,
+          minValue: -100,
+          minStep: 0.1,
+          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+      });
+      this.value = this.getDefaultValue();
+    };
+    inherits(DailyMaxTemperature, Characteristic);
+
+    let DailyMinTemperature = function () {
+      Characteristic.call(this, 'Daily Min Temperature', '422693A5-2703-4AE2-AF6A-8D40B2DE3A33');
+      this.setProps({
+          format: Characteristic.Formats.FLOAT,
+          unit: Characteristic.Units.CELSIUS,
+          maxValue: 100,
+          minValue: -100,
           minStep: 0.1,
           perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
       });
@@ -46,11 +60,7 @@ class TelldusTemperature extends TelldusAccessory {
 
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     this.service.addCharacteristic(DailyMaxTemperature)
-
-    console.log(this.service
-    .getCharacteristic(DailyMaxTemperature))
-    console.log(this.service
-    .getCharacteristic(this.Characteristic.CurrentTemperature))
+    this.service.addCharacteristic(DailyMinTemperature)
 
     // Should work with negative values
     this.service
@@ -68,6 +78,10 @@ class TelldusTemperature extends TelldusAccessory {
     this.service
     .getCharacteristic(DailyMaxTemperature)
     .on('get', this.getDailyMaxTemperature.bind(this))
+
+    this.service
+    .getCharacteristic(DailyMinTemperature)
+    .on('get', this.getDailyMinTemperature.bind(this))
 
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
@@ -111,7 +125,19 @@ class TelldusTemperature extends TelldusAccessory {
   }
 
   getDailyMaxTemperature(callback){
-    callback(null, 10)
+    this.db.serialize(() => {
+      this.db.each("select max(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", (err, row) =>{
+        callback(null, row.value)
+      });
+    });
+  }
+
+  getDailyMinTemperature(callback){
+    this.db.serialize(() => {
+      this.db.each("select min(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", (err, row) =>{
+        callback(null, row.value)
+      });
+    });
   }
 
   respondToEvent(type, value) {

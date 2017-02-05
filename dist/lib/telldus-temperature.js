@@ -47,7 +47,21 @@ var TelldusTemperature = function (_TelldusAccessory) {
         format: Characteristic.Formats.FLOAT,
         unit: Characteristic.Units.CELSIUS,
         maxValue: 100,
-        minValue: 0,
+        minValue: -100,
+        minStep: 0.1,
+        perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+      });
+      this.value = this.getDefaultValue();
+    };
+    inherits(DailyMaxTemperature, Characteristic);
+
+    var DailyMinTemperature = function DailyMinTemperature() {
+      Characteristic.call(this, 'Daily Min Temperature', '422693A5-2703-4AE2-AF6A-8D40B2DE3A33');
+      this.setProps({
+        format: Characteristic.Formats.FLOAT,
+        unit: Characteristic.Units.CELSIUS,
+        maxValue: 100,
+        minValue: -100,
         minStep: 0.1,
         perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
       });
@@ -57,9 +71,7 @@ var TelldusTemperature = function (_TelldusAccessory) {
 
     _this.service.addCharacteristic(_this.Characteristic.CurrentRelativeHumidity);
     _this.service.addCharacteristic(DailyMaxTemperature);
-
-    console.log(_this.service.getCharacteristic(DailyMaxTemperature));
-    console.log(_this.service.getCharacteristic(_this.Characteristic.CurrentTemperature));
+    _this.service.addCharacteristic(DailyMinTemperature);
 
     // Should work with negative values
     _this.service.getCharacteristic(_this.Characteristic.CurrentTemperature).props.minValue = -50;
@@ -69,6 +81,8 @@ var TelldusTemperature = function (_TelldusAccessory) {
     _this.service.getCharacteristic(_this.Characteristic.CurrentRelativeHumidity).on('get', _this.getCurrentHumidity.bind(_this));
 
     _this.service.getCharacteristic(DailyMaxTemperature).on('get', _this.getDailyMaxTemperature.bind(_this));
+
+    _this.service.getCharacteristic(DailyMinTemperature).on('get', _this.getDailyMinTemperature.bind(_this));
 
     _this.meta.setCharacteristic(_this.Characteristic.Model, "TemperatureSensor");
 
@@ -132,20 +146,37 @@ var TelldusTemperature = function (_TelldusAccessory) {
   }, {
     key: 'getDailyMaxTemperature',
     value: function getDailyMaxTemperature(callback) {
-      callback(null, 10);
+      var _this4 = this;
+
+      this.db.serialize(function () {
+        _this4.db.each("select max(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", function (err, row) {
+          callback(null, row.value);
+        });
+      });
+    }
+  }, {
+    key: 'getDailyMinTemperature',
+    value: function getDailyMinTemperature(callback) {
+      var _this5 = this;
+
+      this.db.serialize(function () {
+        _this5.db.each("select min(value) as value from sensor where sensor_id = 'sensor12' and datetime > datetime('now','start of day')", function (err, row) {
+          callback(null, row.value);
+        });
+      });
     }
   }, {
     key: 'respondToEvent',
     value: function respondToEvent(type, value) {
-      var _this4 = this;
+      var _this6 = this;
 
       if (type == 1) {
         (function () {
-          _this4.log('Got temperatur update: ' + value + ' for ' + _this4.name);
-          _this4.service.getCharacteristic(_this4.Characteristic.CurrentTemperature).setValue(parseFloat(value));
+          _this6.log('Got temperatur update: ' + value + ' for ' + _this6.name);
+          _this6.service.getCharacteristic(_this6.Characteristic.CurrentTemperature).setValue(parseFloat(value));
           var datetime = new Date().toISOString();
-          _this4.db.serialize(function () {
-            _this4.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                      VALUES(\'' + _this4.id + '\', \'temperatur\', datetime(\'' + datetime + '\'), ' + value + ')');
+          _this6.db.serialize(function () {
+            _this6.db.run('INSERT INTO sensor(sensor_id, type , datetime, value)\n                      VALUES(\'' + _this6.id + '\', \'temperatur\', datetime(\'' + datetime + '\'), ' + value + ')');
           });
         })();
       } else {
