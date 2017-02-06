@@ -140,7 +140,7 @@ class TelldusTemperature extends TelldusAccessory {
   }
 
   _buildSQL(operator, time){
-    `SELECT ${operator}(value) as value
+    return `SELECT ${operator}(value) as value
       FROM sensor 
       WHERE sensor_id = '${this.id}'
       AND datetime > datetime('now','start of ${time}')`
