@@ -27,40 +27,13 @@ class TelldusTemperature extends TelldusAccessory {
     this.id = "sensor" + data.id
     this.service = new this.Service.TemperatureSensor(this.name)
     this.db = db
-    let Characteristic = homebridge.hap.Characteristic
+    let [DailyMaxTemperature, DailyMinTemperature, MonthlyMinTemperature, MonthlyMaxTemperature] = this._createCustomCharacteristics(homebridge.hap.Characteristic)
     
-    let DailyMaxTemperature = function () {
-      Characteristic.call(this, 'Daily Max Temperature', '422693A4-2703-4AE2-AF6A-8D40B2DE3A33');
-      this.setProps({
-          format: Characteristic.Formats.FLOAT,
-          unit: Characteristic.Units.CELSIUS,
-          maxValue: 100,
-          minValue: -100,
-          minStep: 0.1,
-          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-      });
-      this.value = this.getDefaultValue();
-    };
-    inherits(DailyMaxTemperature, Characteristic);
-
-    let DailyMinTemperature = function () {
-      Characteristic.call(this, 'Daily Min Temperature', '422693A5-2703-4AE2-AF6A-8D40B2DE3A33');
-      this.setProps({
-          format: Characteristic.Formats.FLOAT,
-          unit: Characteristic.Units.CELSIUS,
-          maxValue: 100,
-          minValue: -100,
-          minStep: 0.1,
-          perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
-      });
-      this.value = this.getDefaultValue();
-    };
-    inherits(DailyMinTemperature, Characteristic);
-
-
     this.service.addCharacteristic(this.Characteristic.CurrentRelativeHumidity)
     this.service.addCharacteristic(DailyMaxTemperature)
     this.service.addCharacteristic(DailyMinTemperature)
+    this.service.addCharacteristic(MonthlyMinTemperature)
+    this.service.addCharacteristic(MonthlyMaxTemperature)
 
     // Should work with negative values
     this.service
@@ -82,6 +55,14 @@ class TelldusTemperature extends TelldusAccessory {
     this.service
     .getCharacteristic(DailyMinTemperature)
     .on('get', this.getDailyMinTemperature.bind(this))
+
+    this.service
+    .getCharacteristic(MonthlyMaxTemperature)
+    .on('get', this.getMonthlyMaxTemperature.bind(this))
+
+    this.service
+    .getCharacteristic(MonthlyMinTemperature)
+    .on('get', this.getMonthlyMinTemperature.bind(this))
 
     this.meta
     .setCharacteristic(this.Characteristic.Model, "TemperatureSensor")
@@ -126,28 +107,43 @@ class TelldusTemperature extends TelldusAccessory {
 
   getDailyMaxTemperature(callback){
     this.db.serialize(() => {
-      this.db.each(
-        `SELECT MAX(value) as value
-         FROM sensor 
-         WHERE sensor_id = '${this.id}'
-         AND datetime > datetime('now','start of day')`,
-         (err, row) => {
-          callback(null, row.value)
+      this.db.each( this._buildSQL("MAX", "day"), (err, row) => {
+        callback(null, row.value)
       });
     });
   }
 
   getDailyMinTemperature(callback){
     this.db.serialize(() => {
+      this.db.each( this._buildSQL("MIN", "day"), (err, row) =>{
+        callback(null, row.value)
+      });
+    });
+  }
+
+  getMonthlyMaxTemperature(callback){
+    this.db.serialize(() => {
       this.db.each(
-        `SELECT MIN(value) as value
-         FROM sensor 
-         WHERE sensor_id = '${this.id}'
-         AND datetime > datetime('now','start of day')`,
-         (err, row) =>{
+        this._buildSQL("MAX", "month"), (err, row) =>{
           callback(null, row.value)
       });
     });
+  }
+
+  getMonthlyMinTemperature(callback){
+    this.db.serialize(() => {
+      this.db.each(
+        this._buildSQL("Min", "month"), (err, row) =>{
+          callback(null, row.value)
+      });
+    });
+  }
+
+  _buildSQL(operator, time){
+    `SELECT ${operator}(value) as value
+      FROM sensor 
+      WHERE sensor_id = '${this.id}'
+      AND datetime > datetime('now','start of ${time}')`
   }
 
   respondToEvent(type, value) {
@@ -167,6 +163,54 @@ class TelldusTemperature extends TelldusAccessory {
           .setValue(parseFloat(value)
         )
       }
+  }
+
+  _createCustomCharacteristics(Characteristic){
+    let customCharacteristics = []
+
+    let props = {
+        format: Characteristic.Formats.FLOAT,
+        unit: Characteristic.Units.CELSIUS,
+        maxValue: 100,
+        minValue: -100,
+        minStep: 0.1,
+        perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+    }
+
+    let DailyMaxTemperature = function () {
+      Characteristic.call(this, 'Daily Max Temperature', '422693A4-2703-4AE2-AF6A-8D40B2DE3A33');
+      this.setProps(props);
+      this.value = this.getDefaultValue();
+    };
+    inherits(DailyMaxTemperature, Characteristic);
+    customCharacteristics.push(DailyMaxTemperature)
+
+    let DailyMinTemperature = function () {
+      Characteristic.call(this, 'Daily Min Temperature', '422693A5-2703-4AE2-AF6A-8D40B2DE3A33');
+      this.setProps(props);
+      this.value = this.getDefaultValue();
+    };
+    inherits(DailyMinTemperature, Characteristic);
+    customCharacteristics.push(DailyMinTemperature)
+
+    let MonthlyMinTemperature = function () {
+      Characteristic.call(this, 'Monthly Min Temperature', '422693A6-2703-4AE2-AF6A-8D40B2DE3A33');
+      this.setProps(props);
+      this.value = this.getDefaultValue();
+    };
+    inherits(MonthlyMinTemperature, Characteristic);
+    customCharacteristics.push(MonthlyMinTemperature)
+
+    let MonthlyMaxTemperature = function () {
+      Characteristic.call(this, 'Monthly Max Temperature', '422693A7-2703-4AE2-AF6A-8D40B2DE3A33');
+      this.setProps(props);
+      this.value = this.getDefaultValue();
+    };
+    inherits(MonthlyMaxTemperature, Characteristic);
+    customCharacteristics.push(MonthlyMaxTemperature)
+
+    return customCharacteristics
+
   }
 
 }
