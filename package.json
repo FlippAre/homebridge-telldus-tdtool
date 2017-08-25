@@ -20,7 +20,7 @@
     "url": "https://github.com/amlinger/homebridge-telldus-tdtool.git"
   },
   "dependencies": {
-    "sqlite3": "^3.1.8",
+    "sqlite3": "^3.1.9",
     "telldus": "^1.1.0"
   },
   "engines": {
